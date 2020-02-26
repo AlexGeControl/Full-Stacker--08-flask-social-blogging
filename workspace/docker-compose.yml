@@ -1,0 +1,71 @@
+version: '3.4'
+
+services:
+  frontend:
+    build:
+      context: ${PWD}/frontend
+      dockerfile: Dockerfile
+    image: "udaspicelatte/frontend"
+    # switch to root if global installation is needed:
+    user: "root"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ${PWD}/frontend/e2e:/home/node/app/e2e
+      - ${PWD}/frontend/src:/home/node/app/src
+      - ${PWD}/frontend/angular.json:/home/node/app/angular.json
+      - ${PWD}/frontend/ionic.config.json:/home/node/app/ionic.config.json
+      - ${PWD}/frontend/tsconfig.json:/home/node/app/tsconfig.json
+      - ${PWD}/frontend/tslint.json:/home/node/app/tslint.json
+    ports:
+        - "58100:8100"
+    command: "ionic serve --address=0.0.0.0 --port=8100"
+    depends_on:
+      - db
+      - adminer
+      - backend
+
+  backend:
+    build:
+      context: ${PWD}/backend
+      dockerfile: Dockerfile
+    image: "udaspicelatte/backend"
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_DEBUG=true
+      - FLASK_CONFIG=development
+      - DEV_DATABASE_URL=postgresql://udacity:udacity@db:5432/udaspicelatteapp
+      - STATIC_PATH=/app/application/static
+    ports:
+      - "50080:80"
+      - "50443:443"
+    volumes:
+      # remove the following for production with Dockerfile ADD
+      - ${PWD}/backend/application:/app/application
+      - ${PWD}/backend/migrations:/app/migrations
+      - ${PWD}/backend/tests:/app/tests
+      - ${PWD}/backend/config.py:/app/config.py
+      - ${PWD}/backend/app.py:/app/app.py
+      - ${PWD}/backend/requirements.txt:/app/requirements.txt
+      - ${PWD}/backend/uwsgi.ini:/app/uwsgi.ini      
+    depends_on:
+      - db
+      - adminer
+
+  db:
+    image: "postgres"
+    restart: always
+    environment:
+      - POSTGRES_USER=udacity
+      - POSTGRES_PASSWORD=udacity
+      - POSTGRES_DB=udaspicelatteapp
+    volumes:
+      - ${PWD}/volume:/var/lib/postgresql/data
+
+  adminer:
+    image: "adminer"
+    restart: always
+    ports:
+      - "58080:8080"
+    depends_on:
+      - db
