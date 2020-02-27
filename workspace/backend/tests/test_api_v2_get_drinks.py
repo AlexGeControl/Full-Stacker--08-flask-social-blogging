@@ -35,7 +35,7 @@ class APIV2GetDrinksTestCase(unittest.TestCase):
 
         # send request:
         response = self.client.get(
-            url_for('api_v1.get_drinks'), 
+            url_for('api_v2.get_drinks'), 
             content_type='application/json'
         )        
         
@@ -56,7 +56,7 @@ class APIV2GetDrinksTestCase(unittest.TestCase):
         """
         # send request:
         response = self.client.get(
-            url_for('api_v1.get_drinks'), 
+            url_for('api_v2.get_drinks'), 
             content_type='application/json'
         )        
         
@@ -89,7 +89,7 @@ class APIV2GetDrinksTestCase(unittest.TestCase):
 
         # send request:
         response = self.client.get(
-            url_for('api_v1.get_drinks'), 
+            url_for('api_v2.get_drinks'), 
             content_type='application/json'
         )        
         

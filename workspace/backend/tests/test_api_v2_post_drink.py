@@ -35,7 +35,7 @@ class APIV2PostDrinksTestCase(unittest.TestCase):
 
         # send request:
         response = self.client.post(
-            url_for('api_v1.create_drink'),
+            url_for('api_v2.create_drink'),
             content_type='application/json',
             data = json.dumps(
                 {
@@ -80,7 +80,7 @@ class APIV2PostDrinksTestCase(unittest.TestCase):
 
         # send request:
         response = self.client.post(
-            url_for('api_v1.create_drink'),
+            url_for('api_v2.create_drink'),
             content_type='application/json',
             data = json.dumps(
                 {
@@ -119,7 +119,7 @@ class APIV2PostDrinksTestCase(unittest.TestCase):
 
         # send request:
         response = self.client.post(
-            url_for('api_v1.create_drink'),
+            url_for('api_v2.create_drink'),
             content_type='application/json',
             data = json.dumps(
                 {

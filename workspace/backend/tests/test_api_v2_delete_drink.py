@@ -35,7 +35,7 @@ class APIV2DeleteDrinksTestCase(unittest.TestCase):
 
         # send request:
         response = self.client.delete(
-            url_for('api_v1.delete_drink', id = 1), 
+            url_for('api_v2.delete_drink', id = 1), 
             content_type='application/json'
         )        
         
@@ -62,7 +62,7 @@ class APIV2DeleteDrinksTestCase(unittest.TestCase):
 
         # send request:
         response = self.client.delete(
-            url_for('api_v1.delete_drink', id = drink.id + 1), 
+            url_for('api_v2.delete_drink', id = drink.id + 1), 
             content_type='application/json'
         )        
         
@@ -91,7 +91,7 @@ class APIV2DeleteDrinksTestCase(unittest.TestCase):
 
         # send request:
         response = self.client.delete(
-            url_for('api_v1.delete_drink', id = drink.id), 
+            url_for('api_v2.delete_drink', id = drink.id), 
             content_type='application/json'
         )        
         

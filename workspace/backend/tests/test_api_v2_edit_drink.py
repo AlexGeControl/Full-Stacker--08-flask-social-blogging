@@ -38,7 +38,7 @@ class APIV2EditDrinkTestCase(unittest.TestCase):
 
         # send request:
         response = self.client.patch(
-            url_for('api_v1.edit_drink', id = drink.id), 
+            url_for('api_v2.edit_drink', id = drink.id), 
             content_type='application/json',
             data = json.dumps(
                 {
@@ -74,7 +74,7 @@ class APIV2EditDrinkTestCase(unittest.TestCase):
 
         # send request:
         response = self.client.patch(
-            url_for('api_v1.edit_drink', id = drink.id + 10000), 
+            url_for('api_v2.edit_drink', id = drink.id + 10000), 
             content_type='application/json',
             data = json.dumps(
                 {
@@ -109,7 +109,7 @@ class APIV2EditDrinkTestCase(unittest.TestCase):
         # send request:
         new_title = drink.title + "Updated"
         response = self.client.patch(
-            url_for('api_v1.edit_drink', id = drink.id), 
+            url_for('api_v2.edit_drink', id = drink.id), 
             content_type='application/json',
             data = json.dumps(
                 {
