@@ -32,10 +32,11 @@ class DevelopmentConfig(Config):
 
     # sqlite:
     # SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
-    #    'sqlite:///' + os.path.join(basedir, 'todos-dev.sqlite')
+    #   'sqlite:///' + os.path.join(basedir, 'database', 'database.db')
 
+    # pgsql:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
-        'postgresql://udacity:udacity@db:5432/udaspicelatteapp'
+       'postgresql://udacity:udacity@db:5432/udaspicelatteapp'
 
 class TestingConfig(Config):
     TESTING = True

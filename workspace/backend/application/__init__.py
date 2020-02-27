@@ -41,12 +41,15 @@ def create_app(config_name):
     app.logger.info('errors')
     app.logger.addHandler(create_file_handler(basedir))
 
-    # attach routes and custom error pages here    
+    # attach routes and custom error pages here
     from .main import bp as blueprint_main
-    app.register_blueprint(blueprint_main)
+    app.register_blueprint(blueprint_main, url_prefix='/api/v1')
 
-    from .auth import bp as blueprint_auth
-    app.register_blueprint(blueprint_auth, url_prefix='/auth')
+    from .api.v1 import bp as blueprint_api_v1
+    app.register_blueprint(blueprint_api_v1, url_prefix='/api/v1')
+
+    from .api.v2 import bp as blueprint_api_v2
+    app.register_blueprint(blueprint_api_v2, url_prefix='/api/v2')
 
     return app
 

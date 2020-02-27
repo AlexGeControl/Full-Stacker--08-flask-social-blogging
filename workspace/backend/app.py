@@ -5,7 +5,7 @@ import click
 from application import create_app, db
 from flask_migrate import Migrate
 
-from application.models import Question, Category
+from application.models import Drink, DrinkFactory
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 Migrate(app, db)
@@ -20,7 +20,7 @@ if os.environ.get('FLASK_COVERAGE'):
 @app.shell_context_processor
 def make_shell_context():
     # make extra variables available in flask shell context:    
-    return dict(db=db, Question=Question, Category=Category)
+    return dict(db=db, Drink=Drink)
 
 @app.cli.command()
 @click.option(
@@ -53,3 +53,52 @@ def test(coverage):
         print('Detailed report in HTML is available at: file://%s/index.html' % covdir)
         # close:        
         cov.erase()
+
+@app.cli.command()
+def init_db():
+    """ Pop DB with initial data
+    """
+    # load JSON file:
+    import json
+
+    with open('data/drinks.json') as drinks_json_file:
+        drinks = json.load(drinks_json_file)
+    
+    # insert every record into db:
+    db.drop_all()
+    db.create_all()
+    success = False
+    try:
+        for drink in drinks:
+            # serialize recipes as one string:
+            drink["recipe"] = json.dumps(drink["recipe"])
+            db.session.add(Drink(**drink))
+        db.session.commit()
+        success = True
+    except:
+        db.session.rollback()
+        success=False
+    finally:
+        db.session.close()
+
+@app.cli.command()
+def list_routes():
+    """ List APP routes
+    """
+    import urllib
+    from flask import url_for
+
+    output = []
+    for rule in app.url_map.iter_rules():
+
+        options = {}
+        for arg in rule.arguments:
+            options[arg] = "[{0}]".format(arg)
+
+        methods = ','.join(rule.methods)
+        url = url_for(rule.endpoint, **options)
+        line = "{:50s} {:20s} {}".format(rule.endpoint, methods, url)
+        output.append(line)
+
+    for line in sorted(output):
+        print(line)

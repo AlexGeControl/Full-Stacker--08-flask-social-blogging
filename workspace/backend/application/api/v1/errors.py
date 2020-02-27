@@ -28,6 +28,19 @@ def not_found(error):
 
     return response, 404
 
+@bp.errorhandler(422)
+def unprocessable(error):
+    # body:
+    response = jsonify(
+        {
+            "success": False, 
+            "error": 422,
+            "message": str(error)
+        }
+    )
+
+    return response, 422
+
 @bp.app_errorhandler(500)
 def internal_server_error(error):
     # body:

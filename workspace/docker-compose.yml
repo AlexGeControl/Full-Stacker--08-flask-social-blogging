@@ -41,6 +41,7 @@ services:
       - "50443:443"
     volumes:
       # remove the following for production with Dockerfile ADD
+      - ${PWD}/backend/data:/app/data
       - ${PWD}/backend/application:/app/application
       - ${PWD}/backend/migrations:/app/migrations
       - ${PWD}/backend/tests:/app/tests
