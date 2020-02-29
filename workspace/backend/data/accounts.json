@@ -5,12 +5,12 @@
     "users": [
         {
             "username": "barista",
-            "email": "barista@UdaSpiceLatte.com",
+            "email": "barista@udaspicelatte.com",
             "password": "barista"
         },
         {
             "username": "manager",
-            "email": "manager@UdaSpiceLatte.com",
+            "email": "manager@udaspicelatte.com",
             "password": "manager"
         }
     ]

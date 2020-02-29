@@ -10,41 +10,47 @@ from application.utils import convert_form_dict_to_dict
 from flask_login import login_user
 from flask_login import logout_user, login_required
 
-@bp.route('/login', methods=['GET'])
+#  Login
+#  ----------------------------------------------------------------
+@bp.route('/login', methods=['GET', 'POST'])
 def login():
     """ render login form
     """
-    # create empty form:
-    form = LoginForm()
-
+    # init form:
+    form = LoginForm(request.form)
+    if request.method == 'POST' and form.validate():
+        # get user:
+        user = User.query.filter(
+            User.email == form.email.data
+        ).first()        
+        
+        # verify:
+        if (not user is None) and (user.verify_password(form.password.data)):
+            # record user as logged in in the user session if remember me is checked:            
+            login_user(user, form.remember_me.data)
+            # parse target URL from query argument next            
+            next = request.args.get('next')
+            # if target URL is not given or not a relative one, redirect to main            
+            if next is None or not next.startswith('/'):               
+                next = url_for('main.index')
+            # head to target URL:
+            return redirect(next)
+        
+        # login failure prompt:
+        flash('Invalid username or password. Please try again.')
+    else:
+        # for debugging only:
+        # flash(form.errors)
     return render_template('auth/forms/login.html', form=form)
 
-@bp.route('/login', methods=['POST'])
-def login_submission():
-    """ verify login
-    """
-    # parse POSTed form:
-    account= convert_form_dict_to_dict(request.form)
-    
-    # get user:
-    user = User.query.filter(
-        User.email == account["email"]
-    ).first()        
-    
-    # verify:
-    if (user is None) or (not user.verify_password(account["password"])):
-        flash('Invalid username or password. Please try again.')
+#  Register
+#  ----------------------------------------------------------------
+@bp.route('/register', methods=['GET', 'POST'])
+def register():
+    pass
 
-    # record user as logged in in the user session if remember me is checked:            
-    login_user(user, account["remember_me"])
-    # parse target URL from query argument next            
-    next = request.args.get('next')
-    # if target URL is not given or not a relative one, redirect to main            
-    if next is None or not next.startswith('/'):                
-        next = url_for('main.index')
-
-    return redirect(next)
-
+#  Logout
+#  ----------------------------------------------------------------
 @bp.route('/logout', methods=['GET'])
 @login_required
 def logout():

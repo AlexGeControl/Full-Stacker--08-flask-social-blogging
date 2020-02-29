@@ -1,5 +1,7 @@
 {% extends 'layouts/main.html' %}
 
+{% from "auth/forms/_form_utils.html" import render_field %}
+
 {% block title %}
   Log In
 {% endblock %}
@@ -7,24 +9,23 @@
 {% block content %}
   <div class="form-wrapper">
     <form class="form" method="post" action="/auth/login">
+      <!-- CSRF tag -->
+      {{ form.hidden_tag() }}
       <h3 class="form-heading">Log In <a href="{{ url_for('main.index') }}" title="Back to homepage"><i class="fa fa-home pull-right"></i></a></h3>
       <!-- account info -->
       <div class="form-group">
-        <label for="email">E-Mail</label>
-        {{ form.email(class_ = 'form-control', placeholder='Your E-Mail', autofocus = true) }}
+        {{ render_field(form.email, class='form-control') }}
       </div>
       <div class="form-group">
-        <label for="password">Password</label>
-        {{ form.password(class_ = 'form-control', placeholder='Your Password', id=form.state, autofocus = true) }}
+        {{ render_field(form.password, class='form-control') }}
       </div>
       <!-- remember me -->
       <div class="form-group">
         <div class="form-check">
-            {{ form.remember_me(class_ = 'form-check-input', id=form.state, autofocus = true) }}
-            <label class="form-check-label">Remember Me</label>
+          {{ render_field(form.remember_me, class='form-check-input') }}
         </div>
       </div>
-      <!-- submit --> 
+      <!-- submit -->
       <input type="submit" value="Log In" class="btn btn-primary btn-lg btn-block">
     </form>
   </div>
