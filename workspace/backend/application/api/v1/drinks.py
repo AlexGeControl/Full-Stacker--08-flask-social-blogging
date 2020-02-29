@@ -1,13 +1,50 @@
 from application import db
+from application.auth.models import User
 from application.models import Drink
 
 import json
+from flask import g
 from flask import abort, request, jsonify
 from . import bp
+
+from flask_httpauth import HTTPBasicAuth
+auth = HTTPBasicAuth()
+
+#  AUTH
+#  ----------------------------------------------------------------
+@auth.verify_password
+def verify_password(email, password):
+    # if account is not provided:
+    if email == '':
+        return False
+
+    # select user:
+    user = User.query.filter(
+        User.email == email
+    ).first()
+
+    # if user doesn't exist:
+    if user is None:
+        return False
+    g.current_user = user
+
+    return user.verify_password(password)
+
+@auth.error_handler
+def unauthorized():
+    response = jsonify(
+        {
+            "success": False, 
+            "error": 401,
+            "message": 'Authentication is needed to access this API.'
+        }
+    )
+    return response, 401
 
 #  CREATE
 #  ----------------------------------------------------------------
 @bp.route('/drinks', methods=['POST'])
+@auth.login_required
 def create_drink():
     """
     POST /drinks
@@ -89,6 +126,7 @@ def get_drinks():
     return response, 200
 
 @bp.route('/drinks-detail', methods=['GET'])
+@auth.login_required
 def get_drinks_detail():
     """
     GET /drinks-detail
@@ -125,6 +163,7 @@ def get_drinks_detail():
 #  PATCH
 #  ----------------------------------------------------------------
 @bp.route('/drinks/<int:id>', methods=['PATCH'])
+@auth.login_required
 def edit_drink(id):
     """
     PATCH /drinks/<id>
@@ -181,6 +220,7 @@ def edit_drink(id):
 #  DELETE
 #  ----------------------------------------------------------------
 @bp.route('/drinks/<int:id>', methods=['DELETE'])
+@auth.login_required
 def delete_drink(id):
     """
     DELETE /drinks/<id>
