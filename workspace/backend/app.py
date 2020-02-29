@@ -5,7 +5,7 @@ import click
 from application import create_app, db
 from flask_migrate import Migrate
 
-from application.auth.models import Role, User
+from application.auth.models import Permission, Role, User
 from application.models import Drink, DrinkFactory
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
@@ -21,7 +21,7 @@ if os.environ.get('FLASK_COVERAGE'):
 @app.shell_context_processor
 def make_shell_context():
     # make extra variables available in flask shell context:    
-    return dict(db=db, Role=Role, User=User, Drink=Drink)
+    return dict(db=db, Permission=Permission, Role=Role, User=User, Drink=Drink)
 
 @app.cli.command()
 @click.option(
@@ -65,6 +65,9 @@ def init_db():
     db.drop_all()
     db.create_all()
 
+    # init roles:
+    Role.init_roles()
+
     # load accounts:
     with open('data/accounts.json') as accounts_json_file:
         accounts = json.load(accounts_json_file)
@@ -73,7 +76,15 @@ def init_db():
     success = False
     try:
         for user in accounts["users"]:
-            db.session.add(User(**user))
+            # init user:
+            user = User(**user)
+            # set role:
+            if user.username.startswith('barista'):
+                user.role_id = Role.query.filter(Role.name == 'barista').first().id
+            elif user.username.startswith('manager'):
+                user.role_id = Role.query.filter(Role.name == 'manager').first().id
+            # add to transaction:
+            db.session.add(user)
         db.session.commit()
         success = True
     except:

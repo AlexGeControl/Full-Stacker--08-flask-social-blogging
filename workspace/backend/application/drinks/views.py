@@ -5,6 +5,7 @@ from flask import render_template
 from flask_login import login_required
 
 from . import bp
+from application.auth.decorators import get_drinks_detail_required, post_drinks_required, patch_drinks_required, delete_drinks_required
 
 #  READ
 #  ----------------------------------------------------------------
@@ -28,6 +29,7 @@ def drinks():
 
 @bp.route('/<int:drink_id>')
 @login_required
+@get_drinks_detail_required
 def show_drink(drink_id):
     """ show given drink
     """
@@ -38,15 +40,11 @@ def show_drink(drink_id):
 
 #  UPDATE
 #  ----------------------------------------------------------------
-@bp.route('/<int:drink_id>/edit', methods=['GET'])
+@bp.route('/<int:drink_id>/edit', methods=['GET', 'POST'])
+@login_required
+@patch_drinks_required
 def edit_drink(drink_id):
     """ render form pre-filled with given drink
-    """
-    return render_template('pages/home.html')
-
-@bp.route('/<int:drink_id>/edit', methods=['POST'])
-def edit_drink_submission(drink_id):
-    """ edit drink using POSTed form
     """
     return render_template('pages/home.html')
 
@@ -54,6 +52,7 @@ def edit_drink_submission(drink_id):
 #  ----------------------------------------------------------------
 @bp.route('/<int:drink_id>', methods=['DELETE'])
 @login_required
+@delete_drinks_required
 def delete_drink(drink_id):
     """ delete drink
     """

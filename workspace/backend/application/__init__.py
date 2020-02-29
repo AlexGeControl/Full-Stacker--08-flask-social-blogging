@@ -33,7 +33,6 @@ def create_app(config_name):
     """
     # config login manager:
     login_manager.init_app(app)
-    login_manager.login_view = 'auth.login'
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -43,6 +42,11 @@ def create_app(config_name):
         user_id = int(user_id)
         
         return User.query.get(user_id)
+    
+    login_manager.login_view = 'auth.login'
+
+    from application.auth.models import AnonymousUser
+    login_manager.anonymous_user = AnonymousUser
 
     # enable SQLAlchemy:
     db.init_app(app)
@@ -58,6 +62,11 @@ def create_app(config_name):
 
     # attach routes and custom error pages here
 
+    #  errors
+    #  ----------------------------------------------------------------
+    from .errors import register_error_handlers
+    register_error_handlers(app)
+    
     #  auth
     #  ----------------------------------------------------------------  
     from .auth import bp as blueprint_auth
