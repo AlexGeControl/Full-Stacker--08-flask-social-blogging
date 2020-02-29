@@ -1,10 +1,13 @@
 from application import db
 from application.models import Drink
 
-from flask import render_template
+from flask import render_template, redirect, request, url_for, flash
 from flask_login import login_required
 
 from . import bp
+
+from .forms import DrinkForm
+
 from application.auth.decorators import get_drinks_detail_required, post_drinks_required, patch_drinks_required, delete_drinks_required
 
 #  READ
@@ -25,7 +28,7 @@ def drinks():
         } for drink in drinks
     ]
     
-    return render_template('pages/drinks.html', drinks=drinks)
+    return render_template('drinks/pages/drinks.html', drinks=drinks)
 
 @bp.route('/<int:drink_id>')
 @login_required
@@ -36,7 +39,7 @@ def show_drink(drink_id):
     # shows the drink page with given drink_id
     drink = Drink.query.get_or_404(drink_id, description='There is no drink with id={}'.format(drink_id)).long()
 
-    return render_template('pages/show_drink.html', drink=drink)
+    return render_template('drinks/pages/show_drink.html', drink=drink)
 
 #  UPDATE
 #  ----------------------------------------------------------------
@@ -46,7 +49,45 @@ def show_drink(drink_id):
 def edit_drink(drink_id):
     """ render form pre-filled with given drink
     """
-    return render_template('pages/home.html')
+    # select drink:
+    drink = Drink.query.get_or_404(drink_id, description='There is no drink with id={}'.format(drink_id))
+
+    if request.method == 'GET':
+        # init form with selected drink:
+        drink = drink.long()
+        form = DrinkForm(
+            title = drink["title"], 
+            recipe = [
+                x["name"] for x in drink["recipe"]
+            ]
+        )
+    if request.method == 'POST': 
+        # init form with POSTed form:
+        form = DrinkForm(request.form)
+
+        if form.validate():        
+            try:
+                # update drink:
+                drink.title = form.title.data
+                # insert:
+                db.session.add(drink)
+                # write
+                db.session.commit()
+                # on successful registration, flash success
+                flash('Drink ' + form.title.data + ' was successfully updated.')
+                return redirect(url_for('drinks.drinks'))
+            except:
+                db.session.rollback()
+                # on unsuccessful registration, flash an error instead.
+                flash('An error occurred. Drink ' + form.title.data + ' could not be updated.')
+            finally:
+                db.session.close()
+        else:
+            # for debugging only:
+            flash(form.errors)
+            pass
+            
+    return render_template('drinks/forms/edit_drink.html', form=form, drink=drink)
 
 #  DELETE
 #  ----------------------------------------------------------------

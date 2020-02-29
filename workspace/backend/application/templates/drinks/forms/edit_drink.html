@@ -1,0 +1,29 @@
+{% extends 'layouts/main.html' %}
+
+{% from "auth/forms/_form_utils.html" import render_field %}
+
+{% block title %}
+  Edit Drink
+{% endblock %}
+
+{% block content %}
+  <div class="form-wrapper">
+    <form class="form" method="post" action="/drinks/{{drink.id}}/edit">
+      <!-- CSRF tag -->
+      {{ form.hidden_tag() }}
+      <h3 class="form-heading">Edit Drink <em><strong>{{ drink.title }}</strong></em></h3>
+      <!-- title -->
+      <div class="form-group">
+          {{ render_field(form.title, class='form-control') }}
+      </div>
+      <!-- recipe -->
+      <div class="form-group">
+        <label for="recipe">Recipe</label>
+        <small>Ctrl+Click to select multiple</small>
+        {{ form.recipe(class='form-control')|safe }}
+      </div>
+      <!-- submit -->
+      <input type="submit" value="Edit Drink" class="btn btn-primary btn-lg btn-block">
+    </form>
+  </div>
+{% endblock %}

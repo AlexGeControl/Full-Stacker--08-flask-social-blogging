@@ -15,6 +15,32 @@ def bad_request(error):
 
     return response, 400
 
+@bp.app_errorhandler(401)
+def unauthorized(error):
+    # body:
+    response = jsonify(
+        {
+            "success": False, 
+            "error": 401,
+            "message": str(error)
+        }
+    )
+
+    return response, 403  
+
+@bp.app_errorhandler(403)
+def forbidden(error):
+    # body:
+    response = jsonify(
+        {
+            "success": False, 
+            "error": 403,
+            "message": str(error)
+        }
+    )
+
+    return response, 403    
+
 @bp.app_errorhandler(404)
 def not_found(error):
     # body:
