@@ -4,7 +4,7 @@ from application.auth.models import Role, User
 from flask import render_template, redirect, request, url_for, flash
 
 from . import bp
-from .forms import LoginForm
+from .forms import LoginForm, RegistrationForm
 from application.utils import convert_form_dict_to_dict
 
 from flask_login import login_user
@@ -41,13 +41,45 @@ def login():
     else:
         # for debugging only:
         # flash(form.errors)
+        pass
+
     return render_template('auth/forms/login.html', form=form)
 
 #  Register
 #  ----------------------------------------------------------------
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
-    pass
+    """ register new account
+    """
+    # init form:
+    form = RegistrationForm(request.form)
+    if request.method == 'POST' and form.validate():        
+        try:
+            # create user:
+            user = User(
+                username = form.username.data,
+                email = form.email.data,
+                password = form.password.data
+            )  
+            # insert:
+            db.session.add(user)
+            # write
+            db.session.commit()
+            # on successful registration, flash success
+            flash('New account ' + form.username.data + ' was successfully created. You can login now.')
+            return redirect(url_for('auth.login'))
+        except:
+            db.session.rollback()
+            # on unsuccessful registration, flash an error instead.
+            flash('An error occurred. New account ' + form.username.data + ' could not be created.')
+        finally:
+            db.session.close()
+    else:
+        # for debugging only:
+        # flash(form.errors)
+        pass
+        
+    return render_template('auth/forms/register.html', form=form)
 
 #  Logout
 #  ----------------------------------------------------------------

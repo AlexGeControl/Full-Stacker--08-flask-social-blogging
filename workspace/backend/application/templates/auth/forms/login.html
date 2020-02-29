@@ -12,6 +12,15 @@
       <!-- CSRF tag -->
       {{ form.hidden_tag() }}
       <h3 class="form-heading">Log In <a href="{{ url_for('main.index') }}" title="Back to homepage"><i class="fa fa-home pull-right"></i></a></h3>
+      <!-- register -->
+      <div class="form-group">
+          <p>
+            New user?
+            <a href="{{ url_for('auth.register') }}">
+              Click here to register
+            </a>
+          </p>   
+      </div>
       <!-- account info -->
       <div class="form-group">
         {{ render_field(form.email, class='form-control') }}
@@ -22,7 +31,8 @@
       <!-- remember me -->
       <div class="form-group">
         <div class="form-check">
-          {{ render_field(form.remember_me, class='form-check-input') }}
+          {{ form.remember_me(class='form-check-input')|safe }}
+          <label class="form-check-label">{{ form.remember_me.label }}</label>
         </div>
       </div>
       <!-- submit -->
