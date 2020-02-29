@@ -5,6 +5,7 @@ import click
 from application import create_app, db
 from flask_migrate import Migrate
 
+from application.auth.models import Role, User
 from application.models import Drink, DrinkFactory
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
@@ -20,7 +21,7 @@ if os.environ.get('FLASK_COVERAGE'):
 @app.shell_context_processor
 def make_shell_context():
     # make extra variables available in flask shell context:    
-    return dict(db=db, Drink=Drink)
+    return dict(db=db, Role=Role, User=User, Drink=Drink)
 
 @app.cli.command()
 @click.option(
@@ -58,15 +59,33 @@ def test(coverage):
 def init_db():
     """ Pop DB with initial data
     """
-    # load JSON file:
     import json
+    
+    # init db:
+    db.drop_all()
+    db.create_all()
 
+    # load accounts:
+    with open('data/accounts.json') as accounts_json_file:
+        accounts = json.load(accounts_json_file)
+    
+    # add users:
+    success = False
+    try:
+        for user in accounts["users"]:
+            db.session.add(User(**user))
+        db.session.commit()
+        success = True
+    except:
+        db.session.rollback()
+        success=False
+    finally:
+        db.session.close()
+
+    # load drinks:
     with open('data/drinks.json') as drinks_json_file:
         drinks = json.load(drinks_json_file)
     
-    # insert every record into db:
-    db.drop_all()
-    db.create_all()
     success = False
     try:
         for drink in drinks:

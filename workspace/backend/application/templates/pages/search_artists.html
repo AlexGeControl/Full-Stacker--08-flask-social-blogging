@@ -1,0 +1,45 @@
+{% extends 'layouts/main.html' %}
+
+{% block title %}
+	Fyyur | Artists Search
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+	<div class="col-12">
+		<h1 class="monospace">SEARCH ARTISTS</h3>
+	</div>
+
+	<div class="col-12">
+		<form method="post" action="/artists/search">
+			<div class="form-group row">
+				<div class="col-sm-10">
+					<input class="form-control" type="text" id="keyword" name="keyword" placeholder="Keyword in Artist Name">
+				</div>
+				<div class="col-sm-2 offset-sm-10">
+					<button class="btn btn-primary" type="submit">Search</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	
+	{% if results and keyword %}
+	<p class="subtitle">
+		NUM. OF RESULTS FOR "{{ keyword }}": {{ results.count }}
+	</p>
+
+	<ul class="items">
+		{% for artist in results.data %}
+		<li>
+			<a href="/artists/{{ artist.id }}">
+				<i class="fas fa-users"></i>
+				<div class="item">
+					<h5>{{ artist.name }}, <small>{{ artist.num_upcoming_shows }} upcoming shows</small></h5>
+				</div>
+			</a>
+		</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+</div>
+{% endblock %}

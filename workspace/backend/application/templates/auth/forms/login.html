@@ -1,0 +1,31 @@
+{% extends 'layouts/main.html' %}
+
+{% block title %}
+  Log In
+{% endblock %}
+
+{% block content %}
+  <div class="form-wrapper">
+    <form class="form" method="post" action="/auth/login">
+      <h3 class="form-heading">Log In <a href="{{ url_for('main.index') }}" title="Back to homepage"><i class="fa fa-home pull-right"></i></a></h3>
+      <!-- account info -->
+      <div class="form-group">
+        <label for="email">E-Mail</label>
+        {{ form.email(class_ = 'form-control', placeholder='Your E-Mail', autofocus = true) }}
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        {{ form.password(class_ = 'form-control', placeholder='Your Password', id=form.state, autofocus = true) }}
+      </div>
+      <!-- remember me -->
+      <div class="form-group">
+        <div class="form-check">
+            {{ form.remember_me(class_ = 'form-check-input', id=form.state, autofocus = true) }}
+            <label class="form-check-label">Remember Me</label>
+        </div>
+      </div>
+      <!-- submit --> 
+      <input type="submit" value="Log In" class="btn btn-primary btn-lg btn-block">
+    </form>
+  </div>
+{% endblock %}

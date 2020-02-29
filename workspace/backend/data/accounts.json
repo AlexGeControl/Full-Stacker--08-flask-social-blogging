@@ -1,0 +1,17 @@
+{
+    "roles": [
+
+    ],
+    "users": [
+        {
+            "username": "barista",
+            "email": "barista@UdaSpiceLatte.com",
+            "password": "barista"
+        },
+        {
+            "username": "manager",
+            "email": "manager@UdaSpiceLatte.com",
+            "password": "manager"
+        }
+    ]
+}

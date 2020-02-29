@@ -29,16 +29,9 @@ class BlueprintMainTestCase(unittest.TestCase):
         """ response code of GET / should be 200 and body should be the greeting in JSON
         """
         response = self.client.get(
-            url_for('main.index'), 
-            content_type='application/json'
+            url_for('main.index')
         )        
         
         # check response code:
         self.assertEqual(response.status_code, 200)
-
-        # parse response body as JSON:
-        json_response = json.loads(response.get_data(as_text=True))
-
-        # check response body:
-        self.assertEqual(json_response['message'], 'Hello, Identity and Access Management development!')
 
