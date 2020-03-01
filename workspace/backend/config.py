@@ -20,6 +20,10 @@ class Config:
     FLASKY_MAIL_SENDER = 'Flasky Admin <flasky@example.com>'
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
     """
+    # auth0 authentication:
+    AUTH0_API_DOMAIN = 'https://dev-d-and-g-udaspicelatte.auth0.com/'
+    AUTH0_API_AUDIENCE = 'drinks'
+    AUTH0_API_SIGNATURE_ALGORITHMS = ['RS256']
 
     @staticmethod
     def init_app(app):

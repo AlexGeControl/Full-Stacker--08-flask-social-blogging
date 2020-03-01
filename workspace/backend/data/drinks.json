@@ -1,6 +1,5 @@
 [
     {
-        "id": 1,
         "title": "matcha shake",
         "recipe": [
             {
@@ -16,7 +15,6 @@
         ]
     },
     {
-        "id": 2,
         "title": "flatwhite",
         "recipe": [
             {
@@ -32,7 +30,6 @@
         ]
     },
     {
-        "id": 3,
         "title": "cap",
         "recipe": [
             {

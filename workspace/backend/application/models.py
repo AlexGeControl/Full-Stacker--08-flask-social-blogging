@@ -14,7 +14,7 @@ class Drink(db.Model):
     __tablename__ = 'drinks'
 
     # primary key, auto-increasing
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
     # title
     title = db.Column(db.String(80), unique=True)

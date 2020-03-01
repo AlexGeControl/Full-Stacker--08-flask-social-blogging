@@ -3,12 +3,16 @@ from application.models import Drink
 
 import json
 from flask import abort, request, jsonify
+
 from . import bp
+
+from .auth.decorators import requires_auth
 
 #  CREATE
 #  ----------------------------------------------------------------
 @bp.route('/drinks', methods=['POST'])
-def create_drink():
+@requires_auth
+def create_drink(account_info):
     """
     POST /drinks
         it should create a new row in the drinks table
@@ -26,7 +30,11 @@ def create_drink():
 
     error = True
     try:
-        drink = Drink(**drink_created)
+        drink = Drink(
+            id = Drink.query.count() + 1,
+            title = drink_created["title"],
+            recipe = drink_created["recipe"]
+        )
         # insert:
         db.session.add(drink)
         db.session.commit()
@@ -89,7 +97,8 @@ def get_drinks():
     return response, 200
 
 @bp.route('/drinks-detail', methods=['GET'])
-def get_drinks_detail():
+@requires_auth
+def get_drinks_detail(account_info):
     """
     GET /drinks-detail
         it should require the 'get:drinks-detail' permission
@@ -125,7 +134,8 @@ def get_drinks_detail():
 #  PATCH
 #  ----------------------------------------------------------------
 @bp.route('/drinks/<int:id>', methods=['PATCH'])
-def edit_drink(id):
+@requires_auth
+def edit_drink(account_info, id):
     """
     PATCH /drinks/<id>
         where <id> is the existing model id
@@ -181,7 +191,8 @@ def edit_drink(id):
 #  DELETE
 #  ----------------------------------------------------------------
 @bp.route('/drinks/<int:id>', methods=['DELETE'])
-def delete_drink(id):
+@requires_auth
+def delete_drink(account_info, id):
     """
     DELETE /drinks/<id>
         where <id> is the existing model id
