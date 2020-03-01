@@ -15,7 +15,8 @@ class AuthError(Exception):
         self.error = error
         self.status_code = status_code
 
-
+#  AUTHENTICATION
+#  ----------------------------------------------------------------
 def get_token():
     """ obtains the Auth0 JWT token from the Authorization header
     """
@@ -143,14 +144,55 @@ def verify_decode_token(token):
         400
     )
 
+#  AUTHORIZATION
+#  ----------------------------------------------------------------
+class Permission:
+    GET_DRINKS_DETAIL = 'get:drinks-detail'
+    POST_DRINKS = 'post:drinks'
+    PATCH_DRINKS = 'patch:drinks'
+    DELETE_DRINKS = 'delete:drinks'
 
-def requires_auth(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        token = get_token()
-        try:
-            payload = verify_decode_token(token)
-        except AuthError as e:
-            abort(401, description=e.error["description"])
-        return f(payload, *args, **kwargs)
-    return wrapper
+
+def check_permission(payload, permission):
+    """ RBAC
+    """
+    if 'permissions' not in payload:
+        raise AuthError(
+            {
+                'code': 'invalid_claims',
+                'description': 'Permissions not included in JWT.'
+            }, 
+            400
+        )
+
+    if permission not in payload['permissions']:
+        raise AuthError(
+            {
+                'code': 'unauthorized',
+                'description': 'Permission not found.'
+            }, 
+            403
+        )
+
+#  AUTHENTICATION
+#  ----------------------------------------------------------------
+def requires_auth(permission = None):
+    """ decorator for authentication
+    """
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            token = get_token()
+            
+            try:
+                # authentication:
+                payload = verify_decode_token(token)
+                # authorization:
+                if not (permission is None):
+                    check_permission(payload, permission)
+            except AuthError as e:
+                abort(e.status_code, description=e.error["description"])
+                
+            return f(payload, *args, **kwargs)
+        return decorated_function
+    return decorator

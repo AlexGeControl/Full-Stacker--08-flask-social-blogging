@@ -6,12 +6,12 @@ from flask import abort, request, jsonify
 
 from . import bp
 
-from .auth.decorators import requires_auth
+from .auth.decorators import Permission, requires_auth
 
 #  CREATE
 #  ----------------------------------------------------------------
 @bp.route('/drinks', methods=['POST'])
-@requires_auth
+@requires_auth(permission = Permission.POST_DRINKS)
 def create_drink(account_info):
     """
     POST /drinks
@@ -97,7 +97,7 @@ def get_drinks():
     return response, 200
 
 @bp.route('/drinks-detail', methods=['GET'])
-@requires_auth
+@requires_auth(permission = Permission.GET_DRINKS_DETAIL)
 def get_drinks_detail(account_info):
     """
     GET /drinks-detail
@@ -134,7 +134,7 @@ def get_drinks_detail(account_info):
 #  PATCH
 #  ----------------------------------------------------------------
 @bp.route('/drinks/<int:id>', methods=['PATCH'])
-@requires_auth
+@requires_auth(permission = Permission.PATCH_DRINKS)
 def edit_drink(account_info, id):
     """
     PATCH /drinks/<id>
@@ -191,7 +191,7 @@ def edit_drink(account_info, id):
 #  DELETE
 #  ----------------------------------------------------------------
 @bp.route('/drinks/<int:id>', methods=['DELETE'])
-@requires_auth
+@requires_auth(permission = Permission.DELETE_DRINKS)
 def delete_drink(account_info, id):
     """
     DELETE /drinks/<id>
