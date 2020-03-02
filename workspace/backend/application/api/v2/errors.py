@@ -26,7 +26,7 @@ def unauthorized(error):
         }
     )
 
-    return response, 403  
+    return response, 401  
 
 @bp.app_errorhandler(403)
 def forbidden(error):

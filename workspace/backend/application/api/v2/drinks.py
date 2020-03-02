@@ -26,7 +26,9 @@ def create_drink(account_info):
     # parse POSTed json:
     drink_created = request.get_json()
     # serialize recipe as one string:
-    drink_created["recipe"] = json.dumps(drink_created["recipe"])
+    drink_created["recipe"] = json.dumps(
+        drink_created.get("recipe", [])
+    )
 
     error = True
     try:
@@ -151,7 +153,9 @@ def edit_drink(account_info, id):
     # parse POSTed json:
     drink_edited = request.get_json()
     # serialize recipe as one string:
-    drink_edited["recipe"] = json.dumps(drink_edited["recipe"])
+    drink_edited["recipe"] = json.dumps(
+        drink_edited.get("recipe", [])
+    )
 
     error = True
     try:

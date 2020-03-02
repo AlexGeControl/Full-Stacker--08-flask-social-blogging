@@ -22,9 +22,10 @@ def get_token():
     """
     # get authorization header:
     auth = request.headers.get('Authorization', None)
+    
 
     # authorization header should be included:
-    if not auth:
+    if auth is None:
         raise AuthError(
             {
                 'code': 'authorization_header_missing',
@@ -32,6 +33,7 @@ def get_token():
             }, 
             401
         )
+    
 
     # authorization header should be 'Bearer [JWT]'
     parts = auth.split()
@@ -43,7 +45,6 @@ def get_token():
             }, 
             401
         )
-
     elif len(parts) == 1:
         raise AuthError(
             {
@@ -52,7 +53,6 @@ def get_token():
             }, 
             401
         )
-
     elif len(parts) > 2:
         raise AuthError(
             {
@@ -182,9 +182,9 @@ def requires_auth(permission = None):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            token = get_token()
-            
             try:
+                # get JWT token:
+                token = get_token()
                 # authentication:
                 payload = verify_decode_token(token)
                 # authorization:
