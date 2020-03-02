@@ -27,7 +27,88 @@ class APIV2PostDrinksTestCase(unittest.TestCase):
         # deactivate app context:
         self.app_context.pop()
 
-    def test_post_drink(self):
+    def get_api_headers(self, token):  
+        """ api header generation
+        """      
+        return {            
+            'Authorization': 'Bearer ' + token,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+
+    def test_post_drink_role_public(self):
+        """  response should have status code 403 and json {"success": False} using role public
+        """        
+        # generate drink:
+        drink = DrinkFactory()
+
+        # send request:
+        response = self.client.post(
+            url_for('api_v2.create_drink'),
+            headers=self.get_api_headers(
+                token = current_app.config['AUTH0_ROLE_PUBLIC']
+            ),
+            content_type='application/json',
+            data = json.dumps(
+                {
+                    "title": drink.title + 'Exclusive',
+                    "recipe": json.loads(
+                        drink.recipe
+                    )
+                }
+            )
+        )
+
+        # check status code:
+        self.assertEqual(response.status_code, 401)
+
+        # parse json response:
+        json_response = json.loads(
+            response.get_data(as_text=True)
+        )
+
+        # check success:
+        self.assertEqual(
+            json_response["success"], False
+        )
+
+    def test_post_drink_role_barista(self):
+        """  response should have status code 403 and json {"success": False} using role barista
+        """        
+        # generate drink:
+        drink = DrinkFactory()
+
+        # send request:
+        response = self.client.post(
+            url_for('api_v2.create_drink'),
+            headers=self.get_api_headers(
+                token = current_app.config['AUTH0_ROLE_BARISTA']
+            ),
+            content_type='application/json',
+            data = json.dumps(
+                {
+                    "title": drink.title + 'Exclusive',
+                    "recipe": json.loads(
+                        drink.recipe
+                    )
+                }
+            )
+        )
+
+        # check status code:
+        self.assertEqual(response.status_code, 403)
+
+        # parse json response:
+        json_response = json.loads(
+            response.get_data(as_text=True)
+        )
+
+        # check success:
+        self.assertEqual(
+            json_response["success"], False
+        )
+
+    def test_post_drink_role_manager(self):
         """  response should have status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         """        
         # generate drink:
@@ -36,6 +117,9 @@ class APIV2PostDrinksTestCase(unittest.TestCase):
         # send request:
         response = self.client.post(
             url_for('api_v2.create_drink'),
+            headers=self.get_api_headers(
+                token = current_app.config['AUTH0_ROLE_MANAGER']
+            ),
             content_type='application/json',
             data = json.dumps(
                 {
@@ -72,7 +156,7 @@ class APIV2PostDrinksTestCase(unittest.TestCase):
             self.assertTrue("parts" in ingredient)
             self.assertTrue("name" in ingredient)
 
-    def test_post_drink(self):
+    def test_post_duplicated_drink_role_manager(self):
         """  response should have status code 500 and json {"success": False} where drink has a duplicated name
         """        
         # generate drink:
@@ -81,6 +165,9 @@ class APIV2PostDrinksTestCase(unittest.TestCase):
         # send request:
         response = self.client.post(
             url_for('api_v2.create_drink'),
+            headers=self.get_api_headers(
+                token = current_app.config['AUTH0_ROLE_MANAGER']
+            ),
             content_type='application/json',
             data = json.dumps(
                 {
@@ -120,6 +207,9 @@ class APIV2PostDrinksTestCase(unittest.TestCase):
         # send request:
         response = self.client.post(
             url_for('api_v2.create_drink'),
+            headers=self.get_api_headers(
+                token = current_app.config['AUTH0_ROLE_MANAGER']
+            ),
             content_type='application/json',
             data = json.dumps(
                 {

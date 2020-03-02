@@ -27,7 +27,80 @@ class APIV2DeleteDrinksTestCase(unittest.TestCase):
         # deactivate app context:
         self.app_context.pop()
 
-    def test_delete_drink_from_empty_db(self):
+    def get_api_headers(self, token):  
+        """ api header generation
+        """      
+        return {            
+            'Authorization': 'Bearer ' + token,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+
+    def test_delete_drink_role_public(self):
+        """  response should have status code 200 and json {"success": False} with role public
+        """
+        # generate drinks:
+        for _ in range(3):
+            # generate:
+            drink = DrinkFactory()
+            # insert:
+            db.session.add(drink)
+            db.session.commit()
+
+        # send request:
+        response = self.client.delete(
+            url_for('api_v2.delete_drink', id = drink.id), 
+            headers=self.get_api_headers(
+                token = current_app.config['AUTH0_ROLE_PUBLIC']
+            ),
+            content_type='application/json'
+        )        
+        
+        # check status code:
+        self.assertEqual(response.status_code, 401)
+
+        # parse json response:
+        json_response = json.loads(
+            response.get_data(as_text=True)
+        )
+        # check success:
+        self.assertEqual(
+            json_response["success"], False
+        )
+
+    def test_delete_drink_role_barista(self):
+        """  response should have status code 200 and json {"success": False} with role barista
+        """
+        # generate drinks:
+        for _ in range(3):
+            # generate:
+            drink = DrinkFactory()
+            # insert:
+            db.session.add(drink)
+            db.session.commit()
+
+        # send request:
+        response = self.client.delete(
+            url_for('api_v2.delete_drink', id = drink.id), 
+            headers=self.get_api_headers(
+                token = current_app.config['AUTH0_ROLE_BARISTA']
+            ),
+            content_type='application/json'
+        )        
+        
+        # check status code:
+        self.assertEqual(response.status_code, 403)
+
+        # parse json response:
+        json_response = json.loads(
+            response.get_data(as_text=True)
+        )
+        # check success:
+        self.assertEqual(
+            json_response["success"], False
+        )
+
+    def test_delete_drink_from_empty_db_role_manager(self):
         """  response should have status code 500 and json {"success": False} when the drinks table is not created
         """
         # remove tables:
@@ -36,6 +109,9 @@ class APIV2DeleteDrinksTestCase(unittest.TestCase):
         # send request:
         response = self.client.delete(
             url_for('api_v2.delete_drink', id = 1), 
+            headers=self.get_api_headers(
+                token = current_app.config['AUTH0_ROLE_MANAGER']
+            ),
             content_type='application/json'
         )        
         
@@ -51,7 +127,7 @@ class APIV2DeleteDrinksTestCase(unittest.TestCase):
             json_response["success"], False
         )
 
-    def test_delete_drink_from_empty_table(self):
+    def test_delete_drink_from_empty_table_role_manager(self):
         """  response should have status code 404 and json {"success": False, "drinks": drinks} where the given drink doesn't exist
         """
         # generate:
@@ -63,6 +139,9 @@ class APIV2DeleteDrinksTestCase(unittest.TestCase):
         # send request:
         response = self.client.delete(
             url_for('api_v2.delete_drink', id = drink.id + 1), 
+            headers=self.get_api_headers(
+                token = current_app.config['AUTH0_ROLE_MANAGER']
+            ),
             content_type='application/json'
         )        
         
@@ -78,7 +157,7 @@ class APIV2DeleteDrinksTestCase(unittest.TestCase):
             json_response["success"], False
         )
 
-    def test_delete_drink(self):
+    def test_delete_drink_role_manager(self):
         """  response should have status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         """
         # generate drinks:
@@ -92,6 +171,9 @@ class APIV2DeleteDrinksTestCase(unittest.TestCase):
         # send request:
         response = self.client.delete(
             url_for('api_v2.delete_drink', id = drink.id), 
+            headers=self.get_api_headers(
+                token = current_app.config['AUTH0_ROLE_MANAGER']
+            ),
             content_type='application/json'
         )        
         

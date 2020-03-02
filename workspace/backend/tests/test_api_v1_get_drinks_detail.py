@@ -89,7 +89,7 @@ class APIV1GetDrinksDetailTestCase(unittest.TestCase):
         )
 
     def test_get_drinks_detail(self):
-        """  response should have status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks with no detail
+        """  response should have status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks with detail
         """
         # create account:
         barista = User(

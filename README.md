@@ -14,39 +14,43 @@ The building of frontend would take some time because of npm install. Grab a cof
 docker-compose build
 ```
 
-### Prepare Database
+### Initialize Database
 
-#### Identify PG Instance
+#### Identify Backend Instance
 
-First, identify Postgres DB instance by typing the following command. Select the one whose name contains **db**
+First, identify backend instance by typing the following command. Select the one whose name contains **backend**
 
 ```bash
 docker ps -a
 ```
 
-<img src="doc/01-services.png" alt="Services"/>
+<img src="doc/services.png" alt="Services"/>
 
 #### Restore Database
 
-Then, enter the instance and restore data by typing:
+Then, enter the instance and initialize DB data by typing:
 
 ```bash
-# enter postgres instance:
-docker exec -it trivia_db_1_ac29f1755358 bash
-# restore db:
-psql -U udacity -d triviaapp < trivia.psql
+# enter backend instance:
+docker exec -it workspace_backend_1_ab7efdf943c8 bash
+# init db:
+flask init-db
 ```
 
 ### Check Host Ports
 
 Make sure the following ports are not used on local host:
-* **8080** This port will be used by **PG adminer** for web-browser based DB admin
-* **60080** This port will be used by Trivia backend for easy debugging
-* **3000** This port will be used by Trivia frontend for React app serving
+* **localhost:58100** This port will be used by frontend APP
+* **localhost:50080** This port will be used by backend for easy debugging
+* **localhost:58080** This port will be used by PG adminer for easy database administration
 
 ### Launch
 
-Launch the system using docker-compose. Note: the services will communicate using docker internal network
+Launch the system using docker-compose. Note: 
+
+* The frontend and the backend will communicate using host network
+* The backend will communicate with PGSQL DB using docker compose internal network
+
 ```bash
 docker-compose up
 ```
@@ -55,253 +59,7 @@ docker-compose up
 
 ## API Endpoints
 
-### Overview
 
-| Method |               Request URL              |                                                                                               Description                                                                                              |                             Request Arguments                            |                                                Response                                                |
-|:------:|:--------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------:|
-|   GET  |           /api/v1/questions/           |                                                                    get questions with pagination (default to 10 questions per page)                                                                    |                           query parameter page                           |              a list of questions, number of total questions, current category, categories              |
-|   GET  |           /api/v1/categories/          |                                                                                      get all available categories                                                                                      |                                   None                                   | an object with a single key, categories, that contains a object of id: category_string key:value pairs |
-| DELETE |       /api/v1/questions/<int:id>       |                                                                                   delete question using a question ID                                                                                  |                                   None                                   |              an object with key, success, to indicate whether the operation is successful              |
-|  POST  |           /api/v1/questions/           |                                                                                           post a new question                                                                                          | POSTed JSON object with key question, answer, difficulty and category_id |              an object with key, success, to indicate whether the operation is successful              |
-|  POST  | /api/v1/categories/<int:id>/questions/ |                                                                                     get questions based on category                                                                                    |                                   None                                   |                    a list of questions, number of total questions, current category                    |
-|  POST  |        /api/v1/questions/search/       |                                                                 get questions based on whether the search term is inside question body                                                                 |                  POSTed JSON object with key searchTerm                  |                    a list of questions, number of total questions, current category                    |
-|  POST  |            /api/v1/quizzes/            | get questions to play the quiz: it takes category and previous question parameters and return a random questions within the given category, if provided, and that is not one of the previous questions |     POSTed JSON object with key previous questions and quiz category     |                an object with key question. if no more questions the value will be null                |
-
-### Examples
-
-#### GET /api/v1/questions/
-
-Response
-```json
-{
-  "categories": {
-    "1": "Science", 
-    "2": "Art", 
-    "3": "Geography", 
-    "4": "History", 
-    "5": "Entertainment", 
-    "6": "Sports"
-  }, 
-  "current_category": null, 
-  "questions": [
-    {
-      "answer": "Apollo 13", 
-      "category_id": 5, 
-      "difficulty": 4, 
-      "id": 2, 
-      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
-    }, 
-    {
-      "answer": "Tom Cruise", 
-      "category_id": 5, 
-      "difficulty": 4, 
-      "id": 4, 
-      "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
-    }, 
-    {
-      "answer": "Maya Angelou", 
-      "category_id": 4, 
-      "difficulty": 2, 
-      "id": 5, 
-      "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
-    }, 
-    {
-      "answer": "Edward Scissorhands", 
-      "category_id": 5, 
-      "difficulty": 3, 
-      "id": 6, 
-      "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
-    }, 
-    {
-      "answer": "Muhammad Ali", 
-      "category_id": 4, 
-      "difficulty": 1, 
-      "id": 9, 
-      "question": "What boxer's original name is Cassius Clay?"
-    }, 
-    {
-      "answer": "Brazil", 
-      "category_id": 6, 
-      "difficulty": 3, 
-      "id": 10, 
-      "question": "Which is the only team to play in every soccer World Cup tournament?"
-    }, 
-    {
-      "answer": "Uruguay", 
-      "category_id": 6, 
-      "difficulty": 4, 
-      "id": 11, 
-      "question": "Which country won the first ever soccer World Cup in 1930?"
-    }, 
-    {
-      "answer": "George Washington Carver", 
-      "category_id": 4, 
-      "difficulty": 2, 
-      "id": 12, 
-      "question": "Who invented Peanut Butter?"
-    }, 
-    {
-      "answer": "Lake Victoria", 
-      "category_id": 3, 
-      "difficulty": 2, 
-      "id": 13, 
-      "question": "What is the largest lake in Africa?"
-    }, 
-    {
-      "answer": "The Palace of Versailles", 
-      "category_id": 3, 
-      "difficulty": 3, 
-      "id": 14, 
-      "question": "In which royal palace would you find the Hall of Mirrors?"
-    }
-  ], 
-  "total_questions": 20
-}
-```
-
-#### GET /api/v1/categories/
-
-Response
-```json
-{
-  "categories": {
-    "1": "Science", 
-    "2": "Art", 
-    "3": "Geography", 
-    "4": "History", 
-    "5": "Entertainment", 
-    "6": "Sports"
-  }
-}
-```
-
-### DELETE /api/v1/questions/5
-
-Response
-```json
-{
-    "success": true
-}
-```
-
-### POST /api/v1/categories/1/questions/
-
-Response
-```json
-{
-  "current_category": 1, 
-  "questions": [
-    {
-      "answer": "The Liver", 
-      "category_id": 1, 
-      "difficulty": 4, 
-      "id": 20, 
-      "question": "What is the heaviest organ in the human body?"
-    }, 
-    {
-      "answer": "Alexander Fleming", 
-      "category_id": 1, 
-      "difficulty": 3, 
-      "id": 21, 
-      "question": "Who discovered penicillin?"
-    }, 
-    {
-      "answer": "Blood", 
-      "category_id": 1, 
-      "difficulty": 4, 
-      "id": 22, 
-      "question": "Hematology is a branch of medicine involving the study of what?"
-    }, 
-    {
-      "answer": "ANSWER 42", 
-      "category_id": 1, 
-      "difficulty": 5, 
-      "id": 25, 
-      "question": "QUESTION 42"
-    }
-  ], 
-  "total_questions": 4
-}
-```
-
-### POST /api/v1/questions/search/
-
-Request using cURL
-```bash
-curl -H 'Content-Type: application/json' -X POST -d '{"searchTerm": "What"}' http://localhost:60080/api/v1/questions/search/
-```
-
-Response
-```json
-{
-  "current_category": null, 
-  "questions": [
-    {
-      "answer": "Muhammad Ali", 
-      "category_id": 4, 
-      "difficulty": 1, 
-      "id": 9, 
-      "question": "What boxer's original name is Cassius Clay?"
-    }, 
-    {
-      "answer": "Apollo 13", 
-      "category_id": 5, 
-      "difficulty": 4, 
-      "id": 2, 
-      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
-    }, 
-    {
-      "answer": "Tom Cruise", 
-      "category_id": 5, 
-      "difficulty": 4, 
-      "id": 4, 
-      "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
-    }, 
-    {
-      "answer": "Edward Scissorhands", 
-      "category_id": 5, 
-      "difficulty": 3, 
-      "id": 6, 
-      "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
-    }, 
-    {
-      "answer": "Lake Victoria", 
-      "category_id": 3, 
-      "difficulty": 2, 
-      "id": 13, 
-      "question": "What is the largest lake in Africa?"
-    }, 
-    {
-      "answer": "The Liver", 
-      "category_id": 1, 
-      "difficulty": 4, 
-      "id": 20, 
-      "question": "What is the heaviest organ in the human body?"
-    }
-  ], 
-  "total_questions": 6
-}
-```
-
-### POST /api/v1/quizzes/
-
-Request using cURL
-```bash
-curl -H 'Content-Type: application/json' -X POST -d '{"previous_questions": [], "quiz_category": {"id": 0}}' http://localhost:60080/api/v1/quizzes/
-```
-
-Response
-```json
-{
-  "question": {
-    "answer": "Apollo 13", 
-    "category_id": 5, 
-    "difficulty": 4, 
-    "id": 2, 
-    "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
-  }
-}
-```
 
 ---
 
@@ -309,97 +67,120 @@ Response
 
 ### Overview
 
-All the 7 API endpoints are covered by test cases. See 
+All the 5 API endpoints are covered by test cases. For the drinks resource, the coverage rate is 86%. See [Python Unittest Testcases](workspace/backend/tests) and [POSTman Testcases](workspace/backend/tests/postman) for details.
 
-### Up & Running
+### Python Unittest Up & Running
 
-First, identify Postgres DB instance by typing the following command. Select the one whose name contains **backend**
+First, identify backend instance by typing the following command. Select the one whose name contains **backend**
 
 ```bash
 docker ps -a
 ```
 
-<img src="doc/01-services.png" alt="Services"/>
+<img src="doc/services.png" alt="Services"/>
 
 Then, enter the instance and execute the tests by typing:
 
 ```bash
 # enter backend instance:
-docker exec -it trivia_backend_1_7e56e27c3b0a bash
+docker exec -it workspace_backend_1_ab7efdf943c8 bash
 # run tests:
 flask test
 ```
 
-Coverage analysis is also enabled. Use the following command to get the coverage analysis report:
+Test coverage analysis is also enabled. Use the following command to get the coverage analysis report:
 ```bash
 # inside backend instance, type:
 flask test --coverage=True
 ```
 
-<img src="doc/02-coverage-analysis.png" alt="Coverage Analysis"/>
+<img src="doc/test-coverage.png" alt="Test Coverage"/>
+
+### POSTman Testcases Up & Running
+
+The test runner and the results for the three roles(public, barista and manager) are all kept in [POSTman Testcases](workspace/backend/tests/postman)
 
 ---
 
 ## Review
 
-### Code Quality & Documentation
+### Flask Server Setup
 
-#### Write Clear, Concise and Well Documented Code
+#### The Complete Project Has Been Submitted as a Zip and Demonstrates the Ability to Share Code on git
 
-I have refactored the project structure following [Miguel Grinberg](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xv-a-better-application-structure)'s recommended best practices
+The whole project is under version control of git.
 
-#### Write an Informative README
+#### The Project Demonstrates Coding Best Practices
 
-This README includes instructions for:
+The whole project follows the structure recommended by [Flask Mega Tutorial by Miguel Grinberg](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xv-a-better-application-structure)
 
-* How to get the system up & running
+#### The Project Demonstrates an Understanding of RESTful APIs
 
-* API endpoints documentation
+* GET /drinks
+    [here](TBD)
 
-#### Leverage Environment Controls
+* GET /drinks-detail
+    [here](TBD)
 
-Volumes for Docker persistent storage are ignored by the Git
+* POST /drinks
+    [here](TBD)
 
-### Handling HTTP Requests
+* PATCH /drinks/<id>
+    [here](TBD)
 
-#### Follow RESTful Principles
+* DELETE /drinks/<id>
+    [here](TBD)
 
-All RESTful APIs are implemented inside [here](/workspace/trivia/backend/application/api/)
+#### The Project Demonstrates the Ability to Build a Functional Backend
 
-#### Utilize Multiple HTTP Request Methods
+The APP is served by production ready uwsgi + nginx server in Docker. Ready for both functionality and production deployment.
 
-* Endpoint to handle GET requests for questions, including pagination (every 10 questions). This endpoint should return a list of questions, number of total questions, current category, categories.
-    [here](https://github.com/AlexGeControl/Full-Stacker--06-flask-restful-api-development/blob/ed03644bfe497ff4659546c5b6d5711545798794/workspace/trivia/backend/application/api/questions.py#L47)
+### Secure a REST API for Applications
 
-* Endpoint to handle GET requests for all available categories.
-    [here](https://github.com/AlexGeControl/Full-Stacker--06-flask-restful-api-development/blob/ed03644bfe497ff4659546c5b6d5711545798794/workspace/trivia/backend/application/api/categories.py#L9)
+#### The Project Demonstrates an Understanding of Third-Party Authentication Systems
 
-* Endpoint to DELETE question using a question ID.
-    [here](https://github.com/AlexGeControl/Full-Stacker--06-flask-restful-api-development/blob/ed03644bfe497ff4659546c5b6d5711545798794/workspace/trivia/backend/application/api/questions.py#L127)
+Test configuration of Auth0 is available at [here](TBD)
 
-* Endpoint to POST a new question, which will require the question and answer text, category, and difficulty score.
-    [here](https://github.com/AlexGeControl/Full-Stacker--06-flask-restful-api-development/blob/ed03644bfe497ff4659546c5b6d5711545798794/workspace/trivia/backend/application/api/questions.py#L12)
+#### The Project Demonstrates an Understanding of JWTs and Role Based Authentication
 
-* Create a GET endpoint to get questions based on category.
-    [here](https://github.com/AlexGeControl/Full-Stacker--06-flask-restful-api-development/blob/ed03644bfe497ff4659546c5b6d5711545798794/workspace/trivia/backend/application/api/categories.py#L28)
+The JWT based authentication and RBAC logics are implemented at [here](TBD)
 
-* Create a POST endpoint to get questions based on a search term. It should return any questions for whom the search term is a substring of the question.
-    [here](https://github.com/AlexGeControl/Full-Stacker--06-flask-restful-api-development/blob/ed03644bfe497ff4659546c5b6d5711545798794/workspace/trivia/backend/application/api/questions.py#L83)
+#### The Project Demonstrates the Ability to Secure a System through an Understanding of Roles-Based Access Control (RBAC)
 
-* Create a POST endpoint to get questions to play the quiz. This endpoint should take category and previous question parameters and return a random questions within the given category, if provided, and that is not one of the previous questions.
-    [here](https://github.com/AlexGeControl/Full-Stacker--06-flask-restful-api-development/blob/ed03644bfe497ff4659546c5b6d5711545798794/workspace/trivia/backend/application/api/quizzes.py#L14)
+Below are the permissions assigned for the APP:
 
-#### Handle Common Errors
+<img src="doc/auth0-permissions.png" alt="Permissions"/>
 
-All error handlers are registered inside [here](https://github.com/AlexGeControl/Full-Stacker--06-flask-restful-api-development/blob/ed03644bfe497ff4659546c5b6d5711545798794/workspace/trivia/backend/application/api/errors.py#L5)
+Below are the roles and their associations with permissions for the APP:
 
-### API Testing & Documentation
+<img src="doc/auth0-roles-overview.png" alt="Roles"/>
 
-#### Use unittest to Test Flask Application for Expected Behavior
+<img src="doc/auth0-role-barista-details.png" alt="Role Barista"/>
 
-Test cases for all the 7 endpoints are implemented [here](/workspace/trivia/backend/tests)
+<img src="doc/auth0-role-manager-details.png" alt="Role Manager"/>
 
-#### Demonstrate Validity of API Responses
+Below are the users and their associations with roles for the APP:
 
-For the three resources, the coverage rates are all above 70%
+<img src="doc/auth0-users-overview.png" alt="Roles"/>
 
+<img src="doc/auth0-user-customer-details.png" alt="Role Barista"/>
+
+<img src="doc/auth0-user-barista-details.png" alt="Role Manager"/>
+
+<img src="doc/auth0-user-manager-details.png" alt="Role Manager"/>
+
+POSTman test results are available at:
+
+* [Public](workspace/backend/tests/postman/udacity-fsnd-udaspicelatte.postman_test_run_role_public.json)
+* [Barista](workspace/backend/tests/postman/udacity-fsnd-udaspicelatte.postman_test_run_role_barista.json)
+* [Manager](workspace/backend/tests/postman/udacity-fsnd-udaspicelatte.postman_test_run_role_manager.json)
+
+### Frontend
+
+#### The Project Demonstrates an Understanding of How to Loosely Uncouple Authentication and REST Services
+
+The configuration of frontend is available at [Frontend Environment Config](workspace/frontend/src/environment/environment.ts)
+
+#### The Project Demonstrates the Ability to Work across the Stack
+
+The frontend can be run directly using docker-compose following the instructions in section Up & Running.
