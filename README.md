@@ -116,20 +116,22 @@ The whole project follows the structure recommended by [Flask Mega Tutorial by M
 
 #### The Project Demonstrates an Understanding of RESTful APIs
 
+All endpoints are implemented inside [workspace/backend/application/api/v2](workspace/backend/application/api/v2)
+
 * GET /drinks
-    [here](TBD)
+    [here](https://github.com/AlexGeControl/Full-Stacker--07-flask-identity-and-access-management/blob/391ae4a47c9212787b726f282af95decb0618b28/workspace/backend/application/api/v2/drinks.py#L67)
 
 * GET /drinks-detail
-    [here](TBD)
+    [here](https://github.com/AlexGeControl/Full-Stacker--07-flask-identity-and-access-management/blob/391ae4a47c9212787b726f282af95decb0618b28/workspace/backend/application/api/v2/drinks.py#L103)
 
 * POST /drinks
-    [here](TBD)
+    [here](https://github.com/AlexGeControl/Full-Stacker--07-flask-identity-and-access-management/blob/391ae4a47c9212787b726f282af95decb0618b28/workspace/backend/application/api/v2/drinks.py#L15)
 
 * PATCH /drinks/<id>
-    [here](TBD)
+    [here](https://github.com/AlexGeControl/Full-Stacker--07-flask-identity-and-access-management/blob/391ae4a47c9212787b726f282af95decb0618b28/workspace/backend/application/api/v2/drinks.py#L140)
 
 * DELETE /drinks/<id>
-    [here](TBD)
+    [here](https://github.com/AlexGeControl/Full-Stacker--07-flask-identity-and-access-management/blob/391ae4a47c9212787b726f282af95decb0618b28/workspace/backend/application/api/v2/drinks.py#L199)
 
 #### The Project Demonstrates the Ability to Build a Functional Backend
 
@@ -139,11 +141,11 @@ The APP is served by production ready uwsgi + nginx server in Docker. Ready for 
 
 #### The Project Demonstrates an Understanding of Third-Party Authentication Systems
 
-Test configuration of Auth0 is available at [here](TBD)
+Test configuration of Auth0 is available at [here](https://github.com/AlexGeControl/Full-Stacker--07-flask-identity-and-access-management/blob/391ae4a47c9212787b726f282af95decb0618b28/workspace/backend/config.py#L23)
 
 #### The Project Demonstrates an Understanding of JWTs and Role Based Authentication
 
-The JWT based authentication and RBAC logics are implemented at [here](TBD)
+The JWT based authentication and RBAC logics are implemented at [here](https://github.com/AlexGeControl/Full-Stacker--07-flask-identity-and-access-management/blob/391ae4a47c9212787b726f282af95decb0618b28/workspace/backend/application/api/v2/auth/decorators.py#L179)
 
 #### The Project Demonstrates the Ability to Secure a System through an Understanding of Roles-Based Access Control (RBAC)
 
