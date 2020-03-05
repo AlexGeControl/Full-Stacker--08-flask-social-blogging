@@ -21,14 +21,18 @@
 		</div>
 
 		<p class="subtitle">
-			{{ post.author }}, {{ moment(post.timestamp).format('MMMM Do YYYY, h:mm:ss a') }}
+			{{ post.author }}, {{ moment(post.timestamp).fromNow() }}
 		</p>
 
 		<div class="seeking">
 			<p class="lead">Contents</p>
 			<div class="description">
 				<i class="fas fa-quote-left"></i> 
-					{{ post.contents }} 
+				{% if post.contents_html %}
+					{{ post.contents_html | safe }}    
+				{% else %}        
+					{{ post.contents }}    
+				{% endif %}
 				<i class="fas fa-quote-right"></i>
 			</div>
 		</div>

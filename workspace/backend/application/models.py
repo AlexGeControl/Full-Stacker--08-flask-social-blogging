@@ -7,6 +7,9 @@ from faker import Faker
 from datetime import datetime
 import random
 import json
+# markdown rich text editor:
+from markdown import markdown
+import bleach
 
 fake = Faker()
 
@@ -23,10 +26,42 @@ class Post(db.Model):
     # post info:
     title = db.Column(db.Text, nullable=False)
     contents = db.Column(db.Text, nullable=False)
+    contents_html = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow())    
     
     # relationship with users -- many-to-one
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))    
+
+    # triggers:
+    @staticmethod
+    def on_contents_set(target, value, old_value, initiator):
+        """ on contents set hook
+        """
+        # html tag whitelist:
+        allowed_tags = [
+            'a', 
+            'abbr', 
+            'acronym', 
+            'b', 
+            'blockquote', 
+            'code',
+            'em', 
+            'i', 
+            'li', 
+            'ol', 
+            'pre', 
+            'strong', 
+            'ul',
+            'h1', 'h2', 'h3', 
+            'p'
+        ]
+        target.contents_html = bleach.linkify(
+            bleach.clean(
+                markdown(value, output_format='html'),
+                tags=allowed_tags, 
+                strip=True
+            )
+        )
 
     def _format_timestamp_default(self):
         """ format timestamp
@@ -62,6 +97,10 @@ class Post(db.Model):
         self.timestamp = datetime.utcnow() if (not 'timestamp' in data) else \
             datetime.strptime(data['timestamp'], "%Y-%m-%dT%H:%M:%S.%fZ")
 
+# triggers:
+db.event.listen(Post.contents, 'set', Post.on_contents_set)
+
+# fake data generator:
 class PostFactory(factory.alchemy.SQLAlchemyModelFactory):
     """ test post generator
     """

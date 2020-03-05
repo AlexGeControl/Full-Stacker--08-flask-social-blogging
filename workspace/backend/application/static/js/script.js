@@ -11,7 +11,8 @@ function deletePost(element) {
   fetch(
     `/posts/${id}`, 
     {
-        method: 'DELETE'
+        method: 'DELETE',
+        redirect: 'follow'
     }
   ) 
 }

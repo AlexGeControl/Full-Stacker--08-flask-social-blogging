@@ -102,17 +102,16 @@ def init_db():
     
     # add posts:
     success = False
-    try:
-        for _ in range(3):
+    
+    while Post.query.count() < 120:
+        # in case the Faker creates a duplicated post:
+        try:
             # init post:
             post = PostFactory()
-            # set author:
+            # TODO: implement random author assignment:  
             post.author_id = 1
             db.session.add(post)
-        db.session.commit()
-        success = True
-    except:
-        db.session.rollback()
-        success=False
-    finally:
-        db.session.close()    
+            db.session.commit()
+        except:
+            db.session.rollback()
+    db.session.close()    

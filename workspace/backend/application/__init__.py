@@ -3,6 +3,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_login import LoginManager
 from flask_moment import Moment
+from flask_pagedown import PageDown
 from flask_sqlalchemy import SQLAlchemy
 
 from config import basedir, config
@@ -13,6 +14,7 @@ cors = CORS()
 db = SQLAlchemy()
 login_manager = LoginManager()
 moment = Moment()
+pagedown = PageDown()
 
 def create_app(config_name):
     app = Flask(
@@ -52,6 +54,8 @@ def create_app(config_name):
     db.init_app(app)
     # enable moment:
     moment.init_app(app)
+    # enable markdown editor:
+    pagedown.init_app(app)
 
     # jinja:
     app.jinja_env.filters['datetime'] = format_datetime

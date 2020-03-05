@@ -25,6 +25,9 @@ class Config:
     AUTH0_API_AUDIENCE = 'drinks'
     AUTH0_API_SIGNATURE_ALGORITHMS = ['RS256']
 
+    # posts:
+    POSTS_PER_PAGE = 15
+    
     @staticmethod
     def init_app(app):
         """ integrate with app factory

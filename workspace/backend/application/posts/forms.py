@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField
+from flask_pagedown.fields import PageDownField
 from wtforms.validators import DataRequired
 
 class PostForm(FlaskForm):
@@ -10,8 +11,8 @@ class PostForm(FlaskForm):
             DataRequired()
         ]
     )
-    # contents:
-    contents = TextAreaField(
+    # contents -- using markdown rich text editor from PageDown:
+    contents = PageDownField(
         'Contents',
         validators = [
             DataRequired()

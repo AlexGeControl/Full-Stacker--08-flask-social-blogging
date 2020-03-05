@@ -2,7 +2,8 @@ from application import db
 from application.auth.models import User
 from application.models import Post
 
-from flask import render_template, redirect, request, url_for, flash
+from flask import current_app
+from flask import abort, request, flash, render_template, redirect, url_for
 from flask_login import login_required, current_user
 
 from . import bp
@@ -60,13 +61,19 @@ def create_post():
 #  ----------------------------------------------------------------
 @bp.route('/', methods=['GET'])
 def posts():
+    """ show all posts
+    """
+    # parse query parameter page:
+    page = request.args.get('page', 1, type=int)
+
     # data:
     user_subq = User.query.with_entities(
         User.id,
         User.username
     ).subquery()
 
-    posts = Post.query.with_entities(
+    # generate pagination:
+    pagination = Post.query.with_entities(
         Post.id,
         Post.title,
         user_subq.c.username.label("author"),
@@ -75,8 +82,12 @@ def posts():
         user_subq, Post.author_id == user_subq.c.id
     ).order_by(
         Post.timestamp.desc()
-    ).all()
-
+    ).paginate(
+        page, per_page=current_app.config['POSTS_PER_PAGE'],
+        error_out=False
+    )
+    posts = pagination.items
+    
     # format:
     posts=[
         {
@@ -87,7 +98,7 @@ def posts():
         } for (id, title, author, timestamp) in posts
     ]
     
-    return render_template('posts/pages/posts.html', posts=posts)
+    return render_template('posts/pages/posts.html', posts=posts, pagination=pagination)
 
 @bp.route('/<int:post_id>')
 @login_required
@@ -105,7 +116,8 @@ def show_post(post_id):
         Post.title,
         user_subq.c.username.label("author"),
         Post.timestamp,
-        Post.contents
+        Post.contents,
+        Post.contents_html
     ).filter(
         Post.id == post_id
     ).join(
@@ -119,14 +131,15 @@ def show_post(post_id):
         )
 
     # format:
-    (id, title, author, timestamp, contents) = posts[0]
+    (id, title, author, timestamp, contents, contents_html) = posts[0]
 
     post = {
         "id": id,
         "title": title,
         "author": author,
         "timestamp": timestamp,
-        "contents": contents
+        "contents": contents,
+        "contents_html": contents_html
     }
 
     return render_template('posts/pages/post.html', post=post)
@@ -213,4 +226,4 @@ def delete_post(post_id):
     if error:
         abort(400)
 
-    return render_template('pages/home.html')
+    return redirect(url_for('posts.posts'))
