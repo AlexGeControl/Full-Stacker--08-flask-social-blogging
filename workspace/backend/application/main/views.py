@@ -3,7 +3,7 @@ from . import bp
 
 @bp.route('/')
 def index():
-    """ welcome to identity and access management development!
+    """ welcome to uda social blogging as capstone project!
     """
 
     return render_template('pages/home.html')

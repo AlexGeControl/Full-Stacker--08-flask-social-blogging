@@ -33,7 +33,7 @@ def create_app(config_name):
     """
     # config login manager:
     login_manager.init_app(app)
-
+    # a. user loader for session management:
     @login_manager.user_loader
     def load_user(user_id):
         from application.auth.models import User
@@ -42,9 +42,9 @@ def create_app(config_name):
         user_id = int(user_id)
         
         return User.query.get(user_id)
-    
+    # b. endpoint for login view:
     login_manager.login_view = 'auth.login'
-
+    # c. default current_user:
     from application.auth.models import AnonymousUser
     login_manager.anonymous_user = AnonymousUser
 
@@ -77,16 +77,11 @@ def create_app(config_name):
     from .main import bp as blueprint_main
     app.register_blueprint(blueprint_main)
 
-    from .drinks import bp as blueprint_drinks
-    app.register_blueprint(blueprint_drinks, url_prefix='/drinks')
+    from .posts import bp as blueprint_posts
+    app.register_blueprint(blueprint_posts, url_prefix='/posts')
     
     #  apis
     #  ----------------------------------------------------------------  
-    from .api.v1 import bp as blueprint_api_v1
-    app.register_blueprint(blueprint_api_v1, url_prefix='/api/v1')
-
-    from .api.v2 import bp as blueprint_api_v2
-    app.register_blueprint(blueprint_api_v2, url_prefix='/api/v2')
 
     return app
 

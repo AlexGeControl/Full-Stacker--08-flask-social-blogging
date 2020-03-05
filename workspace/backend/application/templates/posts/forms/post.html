@@ -1,0 +1,37 @@
+{% extends 'layouts/main.html' %}
+
+{% from "auth/forms/_form_utils.html" import render_field %}
+
+{% block title %}
+  Uda-Social Blogging | {% if post %}Edit{% else %}Create{% endif %} Post
+{% endblock %}
+
+{% block content %}
+  <div class="form-wrapper">
+    <form class="form" method="post" action={% if post %}"/posts/{{post.id}}/edit"{% else %}"/posts/create"{% endif %}>
+      <!-- CSRF tag -->
+      {{ form.hidden_tag() }}
+
+      <!-- form header -->
+      {% if post %}
+      <h3 class="form-heading">Edit Post <em><strong>{{ post.title }}</strong></em></h3>
+      {% else %}
+      <h3 class="form-heading">Create Post</h3>
+      {% endif %}
+
+      <!-- title -->
+      <div class="form-group">
+        <label for="contents">Title</label>
+        {{ form.title(class='form-control')|safe }}
+      </div>
+      <!-- contents -->
+      <div class="form-group">
+        <label for="contents">Contents</label>
+        {{ form.contents(class='form-control', rows='12')|safe }}
+      </div>
+      
+      <!-- submit -->
+      <input type="submit" value="Edit Post" class="btn btn-primary btn-lg btn-block">
+    </form>
+  </div>
+{% endblock %}

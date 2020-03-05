@@ -6,7 +6,7 @@ from application import create_app, db
 from flask_migrate import Migrate
 
 from application.auth.models import Permission, Role, User
-from application.models import Drink, DrinkFactory
+from application.models import Post, PostFactory
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 Migrate(app, db)
@@ -21,7 +21,14 @@ if os.environ.get('FLASK_COVERAGE'):
 @app.shell_context_processor
 def make_shell_context():
     # make extra variables available in flask shell context:    
-    return dict(db=db, Permission=Permission, Role=Role, User=User, Drink=Drink)
+    return dict(
+        # database connector:
+        db=db, 
+        # authentication and authorization:
+        Permission=Permission, Role=Role, User=User,
+        # posts: 
+        Post=Post, PostFactory=PostFactory
+    )
 
 @app.cli.command()
 @click.option(
@@ -92,43 +99,20 @@ def init_db():
         success=False
     finally:
         db.session.close()
-
-    # load drinks:
-    with open('data/drinks.json') as drinks_json_file:
-        drinks = json.load(drinks_json_file)
     
+    # add posts:
     success = False
     try:
-        for drink in drinks:
-            # serialize recipes as one string:
-            drink["recipe"] = json.dumps(drink["recipe"])
-            db.session.add(Drink(**drink))
+        for _ in range(3):
+            # init post:
+            post = PostFactory()
+            # set author:
+            post.author_id = 1
+            db.session.add(post)
         db.session.commit()
         success = True
     except:
         db.session.rollback()
         success=False
     finally:
-        db.session.close()
-
-@app.cli.command()
-def list_routes():
-    """ List APP routes
-    """
-    import urllib
-    from flask import url_for
-
-    output = []
-    for rule in app.url_map.iter_rules():
-
-        options = {}
-        for arg in rule.arguments:
-            options[arg] = "[{0}]".format(arg)
-
-        methods = ','.join(rule.methods)
-        url = url_for(rule.endpoint, **options)
-        line = "{:50s} {:20s} {}".format(rule.endpoint, methods, url)
-        output.append(line)
-
-    for line in sorted(output):
-        print(line)
+        db.session.close()    

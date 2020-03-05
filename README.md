@@ -1,6 +1,6 @@
 # Udacity Full Stack Development Nanodegree
 
-This is the project for **Identity and Access Management** of Udacity's Full Stack Development Nanodegree
+This is the **capstone project** of Udacity's Full Stack Development Nanodegree
 
 ---
 
@@ -104,85 +104,89 @@ The test runner and the results for the three roles(public, barista and manager)
 
 ## Review
 
-### Flask Server Setup
+### Data Modeling
 
-#### The Complete Project Has Been Submitted as a Zip and Demonstrates the Ability to Share Code on git
+#### Architect Relational Database Models in Python
 
-The whole project is under version control of git.
+* Use of correct data types for fields
+* Use of primary and optional foreign key ids
 
-#### The Project Demonstrates Coding Best Practices
+#### Utilize SQLAlchemy to Conduct Database Queries
 
-The whole project follows the structure recommended by [Flask Mega Tutorial by Miguel Grinberg](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xv-a-better-application-structure)
+* Does not use raw SQL or only where there are not SQLAlchemy equivalent expressions
+* Correctly formats SQLAlchemy to define models
+* Creates methods to serialize model data and helper methods to simplify API behavior such as insert, update and delete.
 
-#### The Project Demonstrates an Understanding of RESTful APIs
+### API Architecture and Testing
 
-All endpoints are implemented inside [workspace/backend/application/api/v2](workspace/backend/application/api/v2)
+#### Follow RESTful Principles of API Development
 
-* GET /drinks
-    [here](https://github.com/AlexGeControl/Full-Stacker--07-flask-identity-and-access-management/blob/391ae4a47c9212787b726f282af95decb0618b28/workspace/backend/application/api/v2/drinks.py#L67)
+* RESTful principles are followed throughout the project, including appropriate naming of endpoints, use of HTTP methods GET, POST, and DELETE
+* Routes perform CRUD operations
 
-* GET /drinks-detail
-    [here](https://github.com/AlexGeControl/Full-Stacker--07-flask-identity-and-access-management/blob/391ae4a47c9212787b726f282af95decb0618b28/workspace/backend/application/api/v2/drinks.py#L103)
+#### Structure Endpoints to Respond to Four HTTP methods with Error Handling
 
-* POST /drinks
-    [here](https://github.com/AlexGeControl/Full-Stacker--07-flask-identity-and-access-management/blob/391ae4a47c9212787b726f282af95decb0618b28/workspace/backend/application/api/v2/drinks.py#L15)
+* Specifies endpoints and behavior for at least:
+    - Two GET requests
+    - One POST request
+    - One PATCH request
+    - One DELETE request
+* Utilize the @app.errorhandler decorator to format error responses as JSON objects for at least four different status codes
 
-* PATCH /drinks/<id>
-    [here](https://github.com/AlexGeControl/Full-Stacker--07-flask-identity-and-access-management/blob/391ae4a47c9212787b726f282af95decb0618b28/workspace/backend/application/api/v2/drinks.py#L140)
+#### Enable Role Based Authentication and Roles-Based Access Control (RBAC) in a Flask application
 
-* DELETE /drinks/<id>
-    [here](https://github.com/AlexGeControl/Full-Stacker--07-flask-identity-and-access-management/blob/391ae4a47c9212787b726f282af95decb0618b28/workspace/backend/application/api/v2/drinks.py#L199)
+* Project includes a custom @requires_auth decorator that:
+    * Get the Authorization header from the request
+    * Decode and verify the JWT using the Auth0 secret
+    * Take an argument to describe the action, i.e. @require_auth(‘create:drink’)
+    * Raise an error if:
+        - The token is expired
+        - The claims are invalid
+        - The token is invalid
+        - The JWT doesn’t contain the proper action
+* Project includes at least two different roles that have distinct permissions for actions. These roles and permissions are clearly defined in the project README. Students can reference the Casting Agency Specs in the Specifications section of this rubric as an example.
 
-#### The Project Demonstrates the Ability to Build a Functional Backend
+#### Demonstrate Validity of API Behavior
 
-The APP is served by production ready uwsgi + nginx server in Docker. Ready for both functionality and production deployment.
+* Includes at least one test for expected success and error behavior for each endpoint using the unittest library
+* Includes tests demonstrating role-based access control, at least two per role.
 
-### Secure a REST API for Applications
+### Third-Party Authentication
 
-#### The Project Demonstrates an Understanding of Third-Party Authentication Systems
+#### Configure Third-Party Authentication Systems
 
-Test configuration of Auth0 is available at [here](https://github.com/AlexGeControl/Full-Stacker--07-flask-identity-and-access-management/blob/391ae4a47c9212787b726f282af95decb0618b28/workspace/backend/config.py#L23)
+Auth0 is set up and running at the time of submission. All required configuration settings are included in a bash file which export:
 
-#### The Project Demonstrates an Understanding of JWTs and Role Based Authentication
+- The Auth0 Domain Name
+- The JWT code signing secret
+- The Auth0 Client ID
 
-The JWT based authentication and RBAC logics are implemented at [here](https://github.com/AlexGeControl/Full-Stacker--07-flask-identity-and-access-management/blob/391ae4a47c9212787b726f282af95decb0618b28/workspace/backend/application/api/v2/auth/decorators.py#L179)
+#### Configure Roles-Based Access Control (RBAC)
 
-#### The Project Demonstrates the Ability to Secure a System through an Understanding of Roles-Based Access Control (RBAC)
+* Roles and permission tables are configured in Auth0.
+* Access of roles is limited. Includes at least two different roles with different permissions.
+* The JWT includes the RBAC permission claims.
 
-Below are the permissions assigned for the APP:
+### Deployment
 
-<img src="doc/auth0-permissions.png" alt="Permissions"/>
+#### Application is Hosted Live at Student Provided URL
 
-Below are the roles and their associations with permissions for the APP:
+* API is hosted live via Heroku
+* URL is provided in project README
+* API can be accessed by URL and requires authentication
 
-<img src="doc/auth0-roles-overview.png" alt="Roles"/>
+#### Includes Instructions to Set Up Authentication
 
-<img src="doc/auth0-role-barista-details.png" alt="Role Barista"/>
+Instructions are provided in README for setting up authentication so reviewers can test endpoints at live application endpoint
 
-<img src="doc/auth0-role-manager-details.png" alt="Role Manager"/>
+### Code Quality & Documentation
 
-Below are the users and their associations with roles for the APP:
+#### Write Clear, Concise and Well Documented Code
 
-<img src="doc/auth0-users-overview.png" alt="Roles"/>
+#### Project Demonstrates Reliability and Testability
 
-<img src="doc/auth0-user-customer-details.png" alt="Role Barista"/>
+#### Project Demonstrates Maintainability
 
-<img src="doc/auth0-user-barista-details.png" alt="Role Manager"/>
+#### Project Includes Thorough Documentation
 
-<img src="doc/auth0-user-manager-details.png" alt="Role Manager"/>
 
-POSTman test results are available at:
-
-* [Public](workspace/backend/tests/postman/udacity-fsnd-udaspicelatte.postman_test_run_role_public.json)
-* [Barista](workspace/backend/tests/postman/udacity-fsnd-udaspicelatte.postman_test_run_role_barista.json)
-* [Manager](workspace/backend/tests/postman/udacity-fsnd-udaspicelatte.postman_test_run_role_manager.json)
-
-### Frontend
-
-#### The Project Demonstrates an Understanding of How to Loosely Uncouple Authentication and REST Services
-
-The configuration of frontend is available at [Frontend Environment Config](workspace/frontend/src/environment/environment.ts)
-
-#### The Project Demonstrates the Ability to Work across the Stack
-
-The frontend can be run directly using docker-compose following the instructions in section Up & Running.

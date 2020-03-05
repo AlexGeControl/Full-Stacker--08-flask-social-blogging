@@ -1,44 +1,20 @@
 version: '3.4'
 
 services:
-  frontend:
-    build:
-      context: ${PWD}/frontend
-      dockerfile: Dockerfile
-    image: "udaspicelatte/frontend"
-    # switch to root if global installation is needed:
-    user: "root"
-    environment:
-      - NODE_ENV=production
-    volumes:
-      - ${PWD}/frontend/e2e:/home/node/app/e2e
-      - ${PWD}/frontend/src:/home/node/app/src
-      - ${PWD}/frontend/angular.json:/home/node/app/angular.json
-      - ${PWD}/frontend/ionic.config.json:/home/node/app/ionic.config.json
-      - ${PWD}/frontend/tsconfig.json:/home/node/app/tsconfig.json
-      - ${PWD}/frontend/tslint.json:/home/node/app/tslint.json
-    ports:
-        - "58100:8100"
-    command: "ionic serve --address=0.0.0.0 --port=8100"
-    depends_on:
-      - db
-      - adminer
-      - backend
-
   backend:
     build:
       context: ${PWD}/backend
       dockerfile: Dockerfile
-    image: "udaspicelatte/backend"
+    image: "udasocialblogging/backend"
     environment:
       - FLASK_APP=app.py
       - FLASK_DEBUG=true
       - FLASK_CONFIG=development
-      - DEV_DATABASE_URL=postgresql://udacity:udacity@db:5432/udaspicelatteapp
+      - DEV_DATABASE_URL=postgresql://udacity:udacity@db:5432/udasocialbloggingapp
       - STATIC_PATH=/app/application/static
     ports:
-      - "50080:80"
-      - "50443:443"
+      - "51080:80"
+      - "51443:443"
     volumes:
       # remove the following for production with Dockerfile ADD
       - ${PWD}/backend/data:/app/data
@@ -59,7 +35,7 @@ services:
     environment:
       - POSTGRES_USER=udacity
       - POSTGRES_PASSWORD=udacity
-      - POSTGRES_DB=udaspicelatteapp
+      - POSTGRES_DB=udasocialbloggingapp
     volumes:
       - ${PWD}/volume:/var/lib/postgresql/data
 

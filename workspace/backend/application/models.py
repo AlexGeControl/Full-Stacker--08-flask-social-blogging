@@ -2,122 +2,79 @@ from application import db
 
 import factory
 import factory.fuzzy
+from faker import Faker
 
+from datetime import datetime
 import random
 import json
 
+fake = Faker()
+
 #----------------------------------------------------------------------------#
-# model
+# posts
 #----------------------------------------------------------------------------#
-class Drink(db.Model):
+class Post(db.Model):
     # follow the best practice
-    __tablename__ = 'drinks'
-
-    # primary key, auto-increasing
-    id = db.Column(db.Integer, primary_key=True)
-
-    # title
-    title = db.Column(db.String(80), unique=True)
+    __tablename__ = 'posts'    
     
-    # the ingredients blob - this stores a lazy json blob
-    # the required datatype is [{'color': string, 'name':string, 'parts':number}]
-    recipe = db.Column(db.String(256), nullable=False)
+    # primary key:
+    id = db.Column(db.Integer, primary_key=True)    
+    
+    # post info:
+    title = db.Column(db.Text, nullable=False)
+    contents = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow())    
+    
+    # relationship with users -- many-to-one
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))    
+
+    def _format_timestamp_default(self):
+        """ format timestamp
+        """
+        return self.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+
+    def _format_timestamp_iso(self):
+        """ format timestamp into iso
+        """
+        return self.timestamp.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
     def __repr__(self):
-        return json.dumps(self.short())
-
-
-    def short(self):
-        ''' short form representation, without details, of the Drink model
-        '''
-        short_recipe = [
-            {
-                'color': r['color'], 
-                'parts': r['parts']
-            } for r in json.loads(self.recipe)
-        ]
-
-        return {
-            'id': self.id,
-            'title': self.title,
-            'recipe': short_recipe
-        }
-
-
-    def long(self):
-        ''' long form representation, with full details, of the Drink model
-        '''
-
-        return {
-            'id': self.id,
-            'title': self.title,
-            'recipe': json.loads(self.recipe)
-        }
-
-#----------------------------------------------------------------------------#
-# data generator
-#----------------------------------------------------------------------------#
-class Ingredient(object):
-    def __init__(self, name, color, parts):
-        self.name = name
-        self.color = color
-        self.parts = parts
+        return f'<Post id="{self.id}" datetime="{self._format_timestamp_default()}" title="{self.title}">'
 
     def to_json(self):
+        """ format as python dict
+        """
         data = {
-            "name": self.name,
-            "color": self.color,
-            "parts": self.parts
+            "id": self.id,
+            "title": self.title,
+            "contents": self.contents,
+            "timestamp": self._format_timestamp_iso(),
+            "author_id": self.author_id,
         }
 
         return data
 
+    def from_json(self, data):
+        """ update object using json input
+        """
+        self.title = data.get('title', '')
+        self.contents = data.get('contents', '')
+        self.timestamp = datetime.utcnow() if (not 'timestamp' in data) else \
+            datetime.strptime(data['timestamp'], "%Y-%m-%dT%H:%M:%S.%fZ")
 
-class IngredientFactory(factory.Factory):
-    class Meta:
-        model = Ingredient
-
-    name = factory.Iterator(
-        [
-            'milk', 
-            'foam', 
-            'coffee', 
-            'matcha'
-        ], cycle=True
-    )
-    color = factory.Iterator(
-        [
-            'grey', 
-            'white', 
-            'brown',
-            'green'
-        ], cycle=True
-    )
-    # parts should be random int from [1, 3]:
-    parts = factory.fuzzy.FuzzyInteger(1, 3)
-
-
-class DrinkFactory(factory.alchemy.SQLAlchemyModelFactory):
-    """ test drink generator
+class PostFactory(factory.alchemy.SQLAlchemyModelFactory):
+    """ test post generator
     """
     class Meta:
-        model = Drink
+        model = Post
         sqlalchemy_session = db.session
 
-    id = factory.Sequence(lambda n: n)
+    # id should start from 1:
+    id = factory.Sequence(lambda n: n + 1)
 
-    title = factory.fuzzy.FuzzyText(length=12)
+    # use faker API to generate better test data:
+    title = factory.Faker('sentence', nb_words=4)
+    contents = factory.Faker('text')
+    timestamp = fake.date_between(start_date='-90d', end_date='today')
 
-    @factory.sequence
-    def recipe(n):
-        # init generator:
-        random.seed(n)
-        # decide the num. of ingredients:
-        num_ingredients = random.randint(1, 3)
-
-        data = [
-            IngredientFactory().to_json() for _ in range(num_ingredients)
-        ]
-
-        return json.dumps(data)
-
+    author_id = factory.Sequence(lambda n: n + 1)

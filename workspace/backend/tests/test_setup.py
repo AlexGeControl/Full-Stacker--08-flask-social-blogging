@@ -36,5 +36,5 @@ class SetupTestCase(unittest.TestCase):
         """
         self.assertTrue(
             current_app.config['SQLALCHEMY_DATABASE_URI'], 
-            'postgresql://udacity:udacity@db:5432/udaspicelatteapp'
+            'postgresql://udacity:udacity@db:5432/udasocialbloggingapp'
         )

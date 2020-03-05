@@ -1,0 +1,41 @@
+{% extends 'layouts/main.html' %}
+
+{% block title %}
+	{{ post.title }} | Post
+{% endblock %}
+
+{% block content %}
+<div class="row">
+	<div class="col-sm-6">
+		<h1 class="monospace">
+			{{ post.title }}
+		</h1>
+
+		<div class="btn-group btn-group-justified m-4">
+			<a href="/posts/{{ post.id }}/edit" class="btn btn-outline-warning" role="button">
+				<span class="fa fa-edit"></span>EDIT
+			</a>
+			<a class="btn btn-outline-danger" role="button" onclick="deletePost(this)" data-id="{{ post.id }}">
+				<span class="fa fa-trash"></span>DELETE
+			</a>
+		</div>
+
+		<p class="subtitle">
+			{{ post.author }}, {{ moment(post.timestamp).format('MMMM Do YYYY, h:mm:ss a') }}
+		</p>
+
+		<div class="seeking">
+			<p class="lead">Contents</p>
+			<div class="description">
+				<i class="fas fa-quote-left"></i> 
+					{{ post.contents }} 
+				<i class="fas fa-quote-right"></i>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6">
+	</div>
+</div>
+
+{% endblock %}
+
