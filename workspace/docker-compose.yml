@@ -6,12 +6,8 @@ services:
       context: ${PWD}/backend
       dockerfile: Dockerfile
     image: "udasocialblogging/backend"
-    environment:
-      - FLASK_APP=app.py
-      - FLASK_DEBUG=true
-      - FLASK_CONFIG=development
-      - DEV_DATABASE_URL=postgresql://udacity:udacity@db:5432/udasocialbloggingapp
-      - STATIC_PATH=/app/application/static
+    env_file:
+      - ${PWD}/backend/uda-social-blogging.env
     ports:
       - "51080:80"
       - "51443:443"

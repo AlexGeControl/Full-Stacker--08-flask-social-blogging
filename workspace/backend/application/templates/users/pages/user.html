@@ -1,0 +1,51 @@
+{% extends 'layouts/main.html' %}
+
+{% block title %}
+	{{ user.nickname }} | Profile
+{% endblock %}
+
+{% block content %}
+<div class="row">
+	<div class="col-sm-6">
+		<h1 class="monospace">
+			{{ user.nickname }}
+		</h1>
+
+		<div class="btn-group btn-group-justified m-4">
+			<a href="/users/{{ user.id }}/edit" class="btn btn-outline-warning" role="button">
+				<span class="fa fa-edit"></span>EDIT
+			</a>
+			<a class="btn btn-outline-danger" role="button" onclick="deletePost(this)" data-id="{{ user.id }}">
+				<span class="fa fa-trash"></span>DELETE
+			</a>
+		</div>
+
+		{% if user.about_me %}
+		<p class="subtitle">
+			{{ user.about_me }}
+		</p>
+		{% endif %}
+
+		{% if user.location %}
+		<p>
+			<i class="fas fa-globe-americas"></i> 
+			From <a href="http://maps.google.com/?q={{ user.location }}">{{ user.location }}</a>
+		</p>
+		{% endif %}
+
+		<p>
+			<i class="fas fa-calendar-check"></i>
+			Last Updated {{ moment(user.last_updated).format('L') }}.
+		</p>
+		<p>
+			<i class="fas fa-clock"></i>
+			Last Seen {{ moment(user.last_seen).fromNow() }}.
+		</p>
+
+	</div>
+	<div class="col-sm-6">
+	</div>
+</div>
+
+{% endblock %}
+

@@ -1,10 +1,13 @@
 from application import db
-from application.auth.models import User
+from application.auth.v1.models import User
 from application.models import Post
 
 from flask import current_app
 from flask import abort, request, flash, render_template, redirect, url_for
+# auth v1:
 from flask_login import login_required, current_user
+# auth v2:
+from application.auth.v2.decorators import requires_auth
 
 from . import bp
 
@@ -15,7 +18,10 @@ from datetime import datetime
 #  CREATE
 #  ----------------------------------------------------------------
 @bp.route('/create', methods=['GET', 'POST'])
-@login_required
+# for local auth:
+# @login_required
+# for delegated auth:
+@requires_auth
 def create_post():
     """ render empty form for new post creation
     """
@@ -101,7 +107,10 @@ def posts():
     return render_template('posts/pages/posts.html', posts=posts, pagination=pagination)
 
 @bp.route('/<int:post_id>')
-@login_required
+# for local auth:
+# @login_required
+# for delegated auth:
+@requires_auth
 def show_post(post_id):
     """ show given post
     """
@@ -147,7 +156,10 @@ def show_post(post_id):
 #  UPDATE
 #  ----------------------------------------------------------------
 @bp.route('/<int:post_id>/edit', methods=['GET', 'POST'])
-@login_required
+# for local auth:
+# @login_required
+# for delegated auth:
+@requires_auth
 def edit_post(post_id):
     """ render form pre-filled with given post
     """
@@ -197,7 +209,10 @@ def edit_post(post_id):
 #  DELETE
 #  ----------------------------------------------------------------
 @bp.route('/<int:post_id>', methods=['DELETE'])
-@login_required
+# for local auth:
+# @login_required
+# for delegated auth:
+@requires_auth
 def delete_post(post_id):
     """ delete post
     """

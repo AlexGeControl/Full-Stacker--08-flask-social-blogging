@@ -1,6 +1,6 @@
 import unittest
 
-from application.auth.models import User
+from application.auth.v1.models import User
 
 class ModelUserTestCase(unittest.TestCase):
     def test_password_setter(self):

@@ -1,11 +1,15 @@
 import os
 import sys
 import click
+from random import randint
 
 from application import create_app, db
 from flask_migrate import Migrate
 
-from application.auth.models import Permission, Role, User
+# for local auth:
+from application.auth.v1.models import Permission, Role, User
+# for delegated auth:
+from application.auth.v2.models import DelegatedUser
 from application.models import Post, PostFactory
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
@@ -25,7 +29,10 @@ def make_shell_context():
         # database connector:
         db=db, 
         # authentication and authorization:
+        # for local auth:
         Permission=Permission, Role=Role, User=User,
+        # for delegated auth:
+        DelegatedUser=DelegatedUser,
         # posts: 
         Post=Post, PostFactory=PostFactory
     )
@@ -63,17 +70,65 @@ def test(coverage):
         cov.erase()
 
 @app.cli.command()
-def init_db():
-    """ Pop DB with initial data
+def init_db_v1():
+    """ Pop DB with initial data for local auth service
     """
     import json
     
     # init db:
     db.drop_all()
     db.create_all()
+    
+    # add users:
+    success = False
+    try:
+        for user in accounts["users"]:
+            # init user:
+            user = User(**user)
+            # set role:
+            if user.username.startswith('user'):
+                user.role_id = Role.query.filter(Role.name == 'user').first().id
+            elif user.username.startswith('admin'):
+                user.role_id = Role.query.filter(Role.name == 'admin').first().id
+            # add to transaction:
+            db.session.add(user)
+        db.session.commit()
+        success = True
+    except:
+        db.session.rollback()
+        success=False
+    finally:
+        db.session.close()
+    user_count = User.query.count()   
+    print("[Init Users]: {} in total".format(user_count))
 
-    # init roles:
-    Role.init_roles()
+    # add posts:
+    while Post.query.count() < 120:
+        # in case the Faker creates a duplicated post:
+        try:
+            # random author selection:
+            user = User.query.offset(
+                randint(0, user_count - 1)
+            ).first()
+            # create post:
+            post = PostFactory(author_id = user.id)
+            db.session.add(post)
+            db.session.commit()
+        except:
+            db.session.rollback()
+    db.session.close()
+    post_count = Post.query.count()   
+    print("[Init Posts]: {} in total".format(post_count))
+
+@app.cli.command()
+def init_db_v2():
+    """ Pop DB with initial data for delegated auth service
+    """
+    import json
+    
+    # init db:
+    db.drop_all()
+    db.create_all()
 
     # load accounts:
     with open('data/accounts.json') as accounts_json_file:
@@ -86,10 +141,10 @@ def init_db():
             # init user:
             user = User(**user)
             # set role:
-            if user.username.startswith('barista'):
-                user.role_id = Role.query.filter(Role.name == 'barista').first().id
-            elif user.username.startswith('manager'):
-                user.role_id = Role.query.filter(Role.name == 'manager').first().id
+            if user.username.startswith('user'):
+                user.role_id = Role.query.filter(Role.name == 'user').first().id
+            elif user.username.startswith('admin'):
+                user.role_id = Role.query.filter(Role.name == 'admin').first().id
             # add to transaction:
             db.session.add(user)
         db.session.commit()
@@ -99,19 +154,23 @@ def init_db():
         success=False
     finally:
         db.session.close()
-    
+    user_count = User.query.count()   
+    print("[Init Users]: {} in total".format(user_count))
+
     # add posts:
-    success = False
-    
     while Post.query.count() < 120:
         # in case the Faker creates a duplicated post:
         try:
-            # init post:
-            post = PostFactory()
-            # TODO: implement random author assignment:  
-            post.author_id = 1
+            # random author selection:
+            user = User.query.offset(
+                randint(0, user_count - 1)
+            ).first()
+            # create post:
+            post = PostFactory(author_id = user.id)
             db.session.add(post)
             db.session.commit()
         except:
             db.session.rollback()
-    db.session.close()    
+    db.session.close()
+    post_count = Post.query.count()   
+    print("[Init Posts]: {} in total".format(post_count))     

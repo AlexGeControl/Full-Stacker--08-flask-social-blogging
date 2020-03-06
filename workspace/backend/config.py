@@ -4,10 +4,33 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
+    # enable auth0 callback:
+    # SERVER_NAME = '0.0.0.0'
+
     # security:
     SECRET_KEY = os.environ.get('SECRET_KEY') or os.urandom(32)
+
     # database:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # auth0 authentication:
+    AUTH0 = None
+    AUTH0_ALGORITHMS = ['RS256']
+    AUTH0_DOMAIN_URL = 'https://dev-d-and-g-udasocialblogging.auth0.com/'
+     # TODO: this must be provided as environment variable
+    AUTH0_MANAGEMENT_TOKEN = os.environ.get('AUTH0_MANAGEMENT_TOKEN')
+    AUTH0_CLIENT_ID = 'i7QHAQjPi6oU1LLFFlU0rlI0q46H3nok'
+    # TODO: this must be provided as environment variable
+    AUTH0_CLIENT_SECRET = os.environ.get('AUTH0_CLIENT_SECRET')
+    AUTH0_DB_CONNECTION = 'Username-Password-Authentication'
+    AUTH0_ACCESS_TOKEN_URL = 'https://dev-d-and-g-udasocialblogging.auth0.com/oauth/token'
+    AUTH0_AUTHORIZE_URL = 'https://dev-d-and-g-udasocialblogging.auth0.com/authorize'
+    AUTH0_LOGOUT_URL = 'https://dev-d-and-g-udasocialblogging.auth0.com/v2/logout'
+    AUTH0_SCOPE = 'openid profile email'
+
+    # posts:
+    POSTS_PER_PAGE = 15
+    
     # mail service:
     """
     MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.googlemail.com')
@@ -20,14 +43,7 @@ class Config:
     FLASKY_MAIL_SENDER = 'Flasky Admin <flasky@example.com>'
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
     """
-    # auth0 authentication:
-    AUTH0_API_DOMAIN = 'https://dev-d-and-g-udasocialblogging.auth0.com/'
-    AUTH0_API_AUDIENCE = 'drinks'
-    AUTH0_API_SIGNATURE_ALGORITHMS = ['RS256']
 
-    # posts:
-    POSTS_PER_PAGE = 15
-    
     @staticmethod
     def init_app(app):
         """ integrate with app factory

@@ -83,13 +83,31 @@
             <li {% if request.endpoint and request.endpoint.startswith('posts') %} class="active" {% endif %}>
               <a href="{{ url_for('posts.posts') }}">Posts</a>
             </li>
-            {% if current_user.is_authenticated %}
+            {% if 'token' in session %}
             <li>
-              <a href="{{ url_for('auth.logout') }}">Log Out</a>
+                <a role="button" href="{{ url_for('users.show_user', id = session['id']) }}">
+                    <span class="fa fa-sign-out"></span>
+                    My Profile
+                </a>
+            </li>
+            <li>
+                <a role="button" href="{{ url_for('auth_v2.logout') }}">
+                    <span class="fa fa-sign-out"></span>
+                    Logout
+                </a>
             </li>
             {% else %}
             <li>
-              <a href="{{ url_for('auth.login') }}">Log In</a>
+                <a role="button" href="{{ url_for('auth_v2.register') }}">
+                    <span class="fa fa-sign-in"></span>
+                    Sign Up
+                </a>
+            </li>
+            <li>
+                <a role="button" href="{{ url_for('auth_v2.logout') }}">
+                    <span class="fa fa-sign-in"></span>
+                    Login
+                </a>
             </li>
             {% endif %}
           </ul>

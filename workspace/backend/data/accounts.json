@@ -4,14 +4,20 @@
     ],
     "users": [
         {
-            "username": "barista",
-            "email": "barista@udaspicelatte.com",
-            "password": "barista"
+            "email": "user@udasocialblogging.com",
+            "password": "user",
+
+            "username": "user",
+            "about_me": "The Content Generator",
+            "location": "Beijing, China"
         },
         {
-            "username": "manager",
-            "email": "manager@udaspicelatte.com",
-            "password": "manager"
+            "email": "admin@udasocialblogging.com",
+            "password": "admin",
+
+            "username": "admin",
+            "about_me": "The Coordinator",
+            "location": "Shanghai, China"
         }
     ]
 }

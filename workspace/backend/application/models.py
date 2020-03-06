@@ -4,7 +4,7 @@ import factory
 import factory.fuzzy
 from faker import Faker
 
-from datetime import datetime
+from datetime import datetime, timezone
 import random
 import json
 # markdown rich text editor:
@@ -114,6 +114,6 @@ class PostFactory(factory.alchemy.SQLAlchemyModelFactory):
     # use faker API to generate better test data:
     title = factory.Faker('sentence', nb_words=4)
     contents = factory.Faker('text')
-    timestamp = fake.date_between(start_date='-90d', end_date='today')
+    timestamp = factory.fuzzy.FuzzyDateTime(datetime(2018, 1, 1, tzinfo=timezone.utc))
 
     author_id = factory.Sequence(lambda n: n + 1)

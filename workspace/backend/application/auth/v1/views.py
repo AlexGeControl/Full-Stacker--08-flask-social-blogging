@@ -1,5 +1,5 @@
 from application import db
-from application.auth.models import Role, User
+from application.auth.v1.models import Role, User
 
 from flask import render_template, redirect, request, url_for, flash
 
@@ -43,7 +43,7 @@ def login():
         # flash(form.errors)
         pass
 
-    return render_template('auth/forms/login.html', form=form)
+    return render_template('auth/v1/forms/login.html', form=form)
 
 #  Register
 #  ----------------------------------------------------------------
@@ -67,7 +67,7 @@ def register():
             db.session.commit()
             # on successful registration, flash success
             flash('New account ' + form.username.data + ' was successfully created. You can login now.')
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('auth.v1.login'))
         except:
             db.session.rollback()
             # on unsuccessful registration, flash an error instead.
@@ -79,7 +79,7 @@ def register():
         # flash(form.errors)
         pass
         
-    return render_template('auth/forms/register.html', form=form)
+    return render_template('auth/v1/forms/register.html', form=form)
 
 #  Logout
 #  ----------------------------------------------------------------
