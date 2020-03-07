@@ -1,0 +1,38 @@
+{% extends 'layouts/main.html' %}
+
+{% from "users/forms/_utils.html" import render_field %}
+
+{% block title %}
+  Uda-Social Blogging | Edit Profile
+{% endblock %}
+
+{% block content %}
+  <div class="form-wrapper">
+    <form class="form" method="post" action="/users/{{user_id}}/edit">
+      <!-- CSRF tag -->
+      {{ form.hidden_tag() }}
+
+      <!-- form header -->
+      <h3 class="form-heading">Edit Profile</h3>
+
+      <!-- nickname -->
+      <div class="form-group">
+        <label for="nickname">Nickname</label>
+        {{ form.nickname(class='form-control')|safe }}
+      </div>
+      <!-- location -->
+      <div class="form-group">
+          <label for="location">Location</label>
+          {{ form.location(class='form-control')|safe }}
+        </div>
+      <!-- aboutme -->
+      <div class="form-group">
+        <label for="about_me">About Me</label>
+        {{ form.about_me(class='form-control', rows='6')|safe }}
+      </div>
+
+      <!-- submit -->
+      <input type="submit" value="Edit Profile" class="btn btn-primary btn-lg btn-block">
+    </form>
+  </div>
+{% endblock %}

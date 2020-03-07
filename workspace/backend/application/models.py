@@ -1,4 +1,6 @@
 from application import db
+from sqlalchemy.dialects.postgresql import UUID
+from uuid import uuid4
 
 import factory
 import factory.fuzzy
@@ -7,6 +9,7 @@ from faker import Faker
 from datetime import datetime, timezone
 import random
 import json
+
 # markdown rich text editor:
 from markdown import markdown
 import bleach
@@ -23,6 +26,9 @@ class Post(db.Model):
     # primary key:
     id = db.Column(db.Integer, primary_key=True)    
     
+    # for public exposure:
+    uuid = db.Column(UUID(as_uuid=True), unique=True, nullable=False, default=uuid4)
+
     # post info:
     title = db.Column(db.Text, nullable=False)
     contents = db.Column(db.Text, nullable=False)
@@ -30,7 +36,7 @@ class Post(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow())    
     
     # relationship with users -- many-to-one
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))    
+    author_id = db.Column(db.String(64), db.ForeignKey('delegated_users.id'))    
 
     # triggers:
     @staticmethod
@@ -80,7 +86,7 @@ class Post(db.Model):
         """ format as python dict
         """
         data = {
-            "id": self.id,
+            "id": self.uuid.hex,
             "title": self.title,
             "contents": self.contents,
             "timestamp": self._format_timestamp_iso(),
@@ -116,4 +122,4 @@ class PostFactory(factory.alchemy.SQLAlchemyModelFactory):
     contents = factory.Faker('text')
     timestamp = factory.fuzzy.FuzzyDateTime(datetime(2018, 1, 1, tzinfo=timezone.utc))
 
-    author_id = factory.Sequence(lambda n: n + 1)
+    author_id = factory.Sequence(lambda n: uuid4().hex)

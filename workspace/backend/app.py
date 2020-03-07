@@ -129,22 +129,23 @@ def init_db_v2():
     # init db:
     db.drop_all()
     db.create_all()
-
-    # load accounts:
-    with open('data/accounts.json') as accounts_json_file:
-        accounts = json.load(accounts_json_file)
     
+    # sycn users from backend:
+    from application.auth.v2.services import Users
+    service_user_management = Users()
+    users = service_user_management.get()
+
     # add users:
     success = False
     try:
-        for user in accounts["users"]:
+        for user in users:
             # init user:
-            user = User(**user)
-            # set role:
-            if user.username.startswith('user'):
-                user.role_id = Role.query.filter(Role.name == 'user').first().id
-            elif user.username.startswith('admin'):
-                user.role_id = Role.query.filter(Role.name == 'admin').first().id
+            _, id = user['user_id'].split('|')
+            user = DelegatedUser(
+                id = id,
+                email = user['email'],
+                nickname = user['nickname']
+            )
             # add to transaction:
             db.session.add(user)
         db.session.commit()
@@ -154,23 +155,25 @@ def init_db_v2():
         success=False
     finally:
         db.session.close()
-    user_count = User.query.count()   
-    print("[Init Users]: {} in total".format(user_count))
+    # get user summary:
+    user_count = DelegatedUser.query.count()   
+    print("[Init Users]: {} in total".format(user_count)) 
 
     # add posts:
     while Post.query.count() < 120:
         # in case the Faker creates a duplicated post:
         try:
             # random author selection:
-            user = User.query.offset(
+            author = DelegatedUser.query.offset(
                 randint(0, user_count - 1)
             ).first()
             # create post:
-            post = PostFactory(author_id = user.id)
+            post = PostFactory(author_id = author.id)
             db.session.add(post)
             db.session.commit()
         except:
             db.session.rollback()
     db.session.close()
+    # get post summary:
     post_count = Post.query.count()   
-    print("[Init Posts]: {} in total".format(post_count))     
+    print("[Init Posts]: {} in total".format(post_count)) 

@@ -1,11 +1,12 @@
 from application import db
-from application.auth.v1.models import User
+import uuid
+from application.auth.v2.models import DelegatedUser
 from application.models import Post
 
 from flask import current_app
+from flask import session
+from application.auth.v2.session import Session
 from flask import abort, request, flash, render_template, redirect, url_for
-# auth v1:
-from flask_login import login_required, current_user
 # auth v2:
 from application.auth.v2.decorators import requires_auth
 
@@ -18,9 +19,6 @@ from datetime import datetime
 #  CREATE
 #  ----------------------------------------------------------------
 @bp.route('/create', methods=['GET', 'POST'])
-# for local auth:
-# @login_required
-# for delegated auth:
 @requires_auth
 def create_post():
     """ render empty form for new post creation
@@ -41,7 +39,7 @@ def create_post():
                     id = id,
                     title = form.title.data,
                     contents = form.contents.data,
-                    author = current_user._get_current_object()
+                    author_id = session[Session.ID]
                 )
                 # insert:
                 db.session.add(post)
@@ -73,16 +71,16 @@ def posts():
     page = request.args.get('page', 1, type=int)
 
     # data:
-    user_subq = User.query.with_entities(
-        User.id,
-        User.username
+    user_subq = DelegatedUser.query.with_entities(
+        DelegatedUser.id,
+        DelegatedUser.nickname
     ).subquery()
 
     # generate pagination:
     pagination = Post.query.with_entities(
-        Post.id,
+        Post.uuid,
         Post.title,
-        user_subq.c.username.label("author"),
+        user_subq.c.nickname.label("author"),
         Post.timestamp
     ).join(
         user_subq, Post.author_id == user_subq.c.id
@@ -97,7 +95,7 @@ def posts():
     # format:
     posts=[
         {
-            "id": id,
+            "id": id.hex,
             "title": title,
             "author": author,
             "timestamp": timestamp,
@@ -106,29 +104,26 @@ def posts():
     
     return render_template('posts/pages/posts.html', posts=posts, pagination=pagination)
 
-@bp.route('/<int:post_id>')
-# for local auth:
-# @login_required
-# for delegated auth:
+@bp.route('/<post_uuid>')
 @requires_auth
-def show_post(post_id):
+def show_post(post_uuid):
     """ show given post
     """
     # data:
-    user_subq = User.query.with_entities(
-        User.id,
-        User.username
+    user_subq = DelegatedUser.query.with_entities(
+        DelegatedUser.id,
+        DelegatedUser.nickname
     ).subquery()
 
     posts = Post.query.with_entities(
-        Post.id,
+        Post.uuid,
         Post.title,
-        user_subq.c.username.label("author"),
+        user_subq.c.nickname.label("author"),
         Post.timestamp,
         Post.contents,
         Post.contents_html
     ).filter(
-        Post.id == post_id
+        Post.uuid == uuid.UUID(post_uuid)
     ).join(
         user_subq, Post.author_id == user_subq.c.id
     ).all()
@@ -136,14 +131,14 @@ def show_post(post_id):
     if len(posts) == 0:
         abort(
             404, 
-            description='There is no post with id={}'.format(post_id)
+            description='There is no post with id={}'.format(post_uuid)
         )
 
     # format:
     (id, title, author, timestamp, contents, contents_html) = posts[0]
 
     post = {
-        "id": id,
+        "id": id.hex,
         "title": title,
         "author": author,
         "timestamp": timestamp,
@@ -155,18 +150,16 @@ def show_post(post_id):
 
 #  UPDATE
 #  ----------------------------------------------------------------
-@bp.route('/<int:post_id>/edit', methods=['GET', 'POST'])
-# for local auth:
-# @login_required
-# for delegated auth:
+@bp.route('/<post_uuid>/edit', methods=['GET', 'POST'])
 @requires_auth
-def edit_post(post_id):
+def edit_post(post_uuid):
     """ render form pre-filled with given post
     """
     # select post:
-    post = Post.query.get_or_404(
-        post_id, 
-        description='There is no post with id={}'.format(post_id)
+    post = Post.query.filter(
+        Post.uuid == uuid.UUID(post_uuid)
+    ).first_or_404(
+        description='There is no post with id={}'.format(post_uuid)
     )
 
     if request.method == 'GET':
@@ -208,21 +201,19 @@ def edit_post(post_id):
 
 #  DELETE
 #  ----------------------------------------------------------------
-@bp.route('/<int:post_id>', methods=['DELETE'])
-# for local auth:
-# @login_required
-# for delegated auth:
+@bp.route('/<post_uuid>', methods=['DELETE'])
 @requires_auth
-def delete_post(post_id):
+def delete_post(post_uuid):
     """ delete post
     """
     error = True
 
     try:
         # find:
-        post = Post.query.get_or_404(
-            post_id, 
-            description='There is no post with id={}'.format(post_id)
+        post = Post.query.filter(
+            Post.uuid == uuid.UUID(post_uuid)
+        ).first_or_404(
+            description='There is no post with id={}'.format(post_uuid)
         )
         db.session.delete(post)
         # write

@@ -122,9 +122,6 @@ class User(db.Model, UserMixin):
     member_since = db.Column(db.DateTime, default=datetime.utcnow())
     last_seen = db.Column(db.DateTime, default=datetime.utcnow())
 
-    # posts:
-    posts = db.relationship('Post', backref='author', lazy=True)
-
     def __repr__(self):
         return '<User %r>' % self.username
 

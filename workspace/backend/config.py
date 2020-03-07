@@ -26,7 +26,7 @@ class Config:
     AUTH0_ACCESS_TOKEN_URL = 'https://dev-d-and-g-udasocialblogging.auth0.com/oauth/token'
     AUTH0_AUTHORIZE_URL = 'https://dev-d-and-g-udasocialblogging.auth0.com/authorize'
     AUTH0_LOGOUT_URL = 'https://dev-d-and-g-udasocialblogging.auth0.com/v2/logout'
-    AUTH0_SCOPE = 'openid profile email'
+    AUTH0_SCOPE = 'openid profile email updated_at'
 
     # posts:
     POSTS_PER_PAGE = 15

@@ -20,9 +20,10 @@ class DelegatedUser(db.Model):
     email = db.Column(db.String(64), unique=True, index=True)
     
     # profile info:
-    nickname = db.Column(db.String(64), unique=True, index=True)
-    about_me = db.Column(db.String(140), nullable=True)
-    location = db.Column(db.String(64), nullable=True)
+    nickname = db.Column(db.String(64), index=True)
+
+    # posts:
+    posts = db.relationship('Post', backref='author', lazy=True)
 
     def __repr__(self):
-        return f'<User {self.username}>' 
+        return f'<User {self.nickname}>' 

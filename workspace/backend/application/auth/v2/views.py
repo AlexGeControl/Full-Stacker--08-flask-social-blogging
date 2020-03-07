@@ -12,6 +12,7 @@ from .services import Users
 from .decorators import requires_auth
 
 import json
+from datetime import datetime
 
 #  Callback
 #  ----------------------------------------------------------------
@@ -35,7 +36,13 @@ def callback():
     _, id = userinfo['sub'].split('|')
     session[Session.ID] = id
     session[Session.TOKEN] = token
-    session[Session.PROFILE] = userinfo
+    session[Session.PROFILE] = {
+        "nickname": userinfo["nickname"],
+        "location": userinfo["user_metadata"]["location"] if ("user_metadata" in userinfo and "location" in userinfo["user_metadata"]) else "",
+        "about_me": userinfo["user_metadata"]["about_me"] if ("user_metadata" in userinfo and "about_me" in userinfo["user_metadata"]) else "",
+        "updated_at": userinfo["updated_at"],
+        "last_login": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+    }
 
     # prompt:
     flash('Welcome!')
@@ -70,7 +77,6 @@ def register():
                 email = form.email.data,
                 password = form.password.data
             )
-            print(response)
             # success:
             if 'identities' in response:         
                 try:

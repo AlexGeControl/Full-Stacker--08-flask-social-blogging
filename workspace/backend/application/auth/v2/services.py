@@ -60,6 +60,15 @@ class Provider:
             json=data
         )
 
+    def patch(self, url, data):
+        """ POST
+        """
+        return requests.patch(
+            url, 
+            headers=self.headers, 
+            json=data
+        )
+
     def delete(self, url, params={}):
         """ DELETE
         """
@@ -208,11 +217,30 @@ class Users(Resource):
 
         return response.json()
 
+    def patch(self, id, nickname, location, about_me):
+        """ update a user
+        """
+        # data:
+        data = {
+            'nickname': nickname,
+            'user_metadata': {
+                'location': location,
+                'about_me': about_me
+            }
+        }
+
+        # new user info:
+        response = self.provider.patch(
+            f'{self.url}/{id}', data
+        )
+
+        return response.json()
+
     def delete(self, id):
         """ delete a user
         """
         # status info:
         response = self.provider.delete(
-            f'{url}/{id}'
+            f'{self.url}/{id}'
         )
         return response.json()

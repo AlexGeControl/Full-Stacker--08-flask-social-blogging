@@ -7,10 +7,12 @@
 {% block content %}
 <div class="row">
 	<div class="col-sm-6">
+		<!-- profile header -->
 		<h1 class="monospace">
 			{{ user.nickname }}
 		</h1>
-
+		
+		<!-- management -->
 		<div class="btn-group btn-group-justified m-4">
 			<a href="/users/{{ user.id }}/edit" class="btn btn-outline-warning" role="button">
 				<span class="fa fa-edit"></span>EDIT
@@ -20,12 +22,14 @@
 			</a>
 		</div>
 
+		<!-- about me -->
 		{% if user.about_me %}
 		<p class="subtitle">
 			{{ user.about_me }}
 		</p>
 		{% endif %}
 
+		<!-- location -->
 		{% if user.location %}
 		<p>
 			<i class="fas fa-globe-americas"></i> 
@@ -33,6 +37,7 @@
 		</p>
 		{% endif %}
 
+		<!-- time stats -->
 		<p>
 			<i class="fas fa-calendar-check"></i>
 			Last Updated {{ moment(user.last_updated).format('L') }}.
@@ -41,8 +46,8 @@
 			<i class="fas fa-clock"></i>
 			Last Seen {{ moment(user.last_seen).fromNow() }}.
 		</p>
-
 	</div>
+	
 	<div class="col-sm-6">
 	</div>
 </div>

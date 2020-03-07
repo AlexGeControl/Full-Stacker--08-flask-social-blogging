@@ -85,7 +85,7 @@
             </li>
             {% if 'token' in session %}
             <li>
-                <a role="button" href="{{ url_for('users.show_user', id = session['id']) }}">
+                <a role="button" href="{{ url_for('users.show_user', user_id = session['id']) }}">
                     <span class="fa fa-sign-out"></span>
                     My Profile
                 </a>
