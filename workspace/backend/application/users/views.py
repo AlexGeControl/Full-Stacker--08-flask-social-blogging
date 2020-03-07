@@ -2,7 +2,7 @@ from datetime import datetime
 
 from application import db
 from application.auth.v2.models import DelegatedUser
-from application.models import Follow
+from application.models import Follow, Post
 
 from flask import current_app
 from flask import session
@@ -25,16 +25,16 @@ from application.auth.v2.models import DelegatedUser
 def show_user(user_id):
     """ show user profile
     """
+    # fetch current user:
+    current_user = DelegatedUser.query.get(session[Session.ID])
+
     # fetch the specified user's profile from backend:
     selected_user = DelegatedUser.query.filter(
         DelegatedUser.id == user_id
     ).first()
-
     userinfo = service_user_by_email.get(selected_user.email)[0]
-
-    # fetch current user:
-    current_user = DelegatedUser.query.get(session[Session.ID])
-
+    
+    # user profile display:
     _, id = userinfo['user_id'].split('|')
     user = {
         "id": id,
@@ -55,7 +55,29 @@ def show_user(user_id):
         "num_followed": Follow.query.filter(Follow.follower_id == user_id).count(),
     }
 
-    return render_template('users/pages/user.html', user=user)
+    # fetch latest posts:
+    posts = Post.query.with_entities(
+        Post.uuid,
+        Post.title,
+        Post.timestamp
+    ).filter(
+        Post.author_id == id
+    ).order_by(
+        Post.timestamp.desc()
+    ).limit(
+        10
+    ).all()
+    
+    # format:
+    posts=[
+        {
+            "id": id.hex,
+            "title": title,
+            "timestamp": timestamp,
+        } for (id, title, timestamp) in posts
+    ]
+
+    return render_template('users/pages/user.html', user=user, posts=posts)
 
 #  UPDATE
 #  ----------------------------------------------------------------

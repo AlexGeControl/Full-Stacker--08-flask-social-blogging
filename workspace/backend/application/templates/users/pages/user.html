@@ -68,6 +68,33 @@
 	</div>
 	
 	<div class="col-sm-6">
+		<!-- latest posts header -->
+		<h1 class="monospace">
+			Latest 10 Posts
+		</h1>
+
+		<ul class="items">
+			{% for post in posts %}
+			<li>
+				<a href="/posts/{{ post.id }}">
+					<i class="fas fa-sticky-note-o"></i>
+					<div class="item">
+						<blockquote class="blockquote">
+							<p class="mb-0 text-left">
+								{{ post.title }}
+							</p>
+							<footer class="blockquote-footer mt-0 text-right">
+								Created at 
+								<cite>
+									{{ moment(post.timestamp).fromNow() }}
+								</cite>
+							</footer>
+						</blockquote>
+					</div>
+				</a>
+			</li>
+			{% endfor %}
+		</ul>
 	</div>
 </div>
 
