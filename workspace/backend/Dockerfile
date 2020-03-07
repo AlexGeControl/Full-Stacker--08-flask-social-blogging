@@ -2,6 +2,8 @@ FROM tiangolo/uwsgi-nginx-flask:python3.7
 
 COPY ${PWD}/requirements.txt /app/requirements.txt
 
+RUN apt-get update && apt-get install -y graphviz
+
 RUN pip install --upgrade pip && \
     pip install -r /app/requirements.txt
 
