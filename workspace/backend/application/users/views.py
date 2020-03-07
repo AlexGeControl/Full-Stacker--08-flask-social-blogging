@@ -2,6 +2,7 @@ from datetime import datetime
 
 from application import db
 from application.auth.v2.models import DelegatedUser
+from application.models import Follow
 
 from flask import current_app
 from flask import session
@@ -24,47 +25,35 @@ from application.auth.v2.models import DelegatedUser
 def show_user(user_id):
     """ show user profile
     """
-    if (session[Session.ID] == user_id):
-        # for current user's profile, fetch from session:
-        user = {
-            "id": session[Session.ID],
-            "nickname": session[Session.PROFILE]["nickname"],
-            "location": session[Session.PROFILE]["location"],
-            "about_me": session[Session.PROFILE]["about_me"],
-            "last_updated": datetime.strptime(
-                session[Session.PROFILE]["updated_at"], 
-                "%Y-%m-%dT%H:%M:%S.%fZ"
-            ),
-            "last_seen": datetime.strptime(
-                session[Session.PROFILE]["updated_at"], 
-                "%Y-%m-%dT%H:%M:%S.%fZ"
-            )
-        }
-    else:
-        # for non current user's profile, fetch from backend:
-        delegated_user = DelegatedUser.query.with_entities(
-            DelegatedUser.email
-        ).filter(
-            DelegatedUser.id == user_id
-        ).first()
+    # fetch the specified user's profile from backend:
+    selected_user = DelegatedUser.query.filter(
+        DelegatedUser.id == user_id
+    ).first()
 
-        userinfo = service_user_by_email.get(delegated_user.email)[0]
+    userinfo = service_user_by_email.get(selected_user.email)[0]
 
-        _, id = userinfo['user_id'].split('|')
-        user = {
-            "id": id,
-            "nickname": userinfo["nickname"],
-            "location": userinfo["user_metadata"]["location"] if ("user_metadata" in userinfo and "location" in userinfo["user_metadata"]) else "",
-            "about_me": userinfo["user_metadata"]["about_me"] if ("user_metadata" in userinfo and "about_me" in userinfo["user_metadata"]) else "",
-            "last_updated": datetime.strptime(
-                userinfo["updated_at"], 
-                "%Y-%m-%dT%H:%M:%S.%fZ"
-            ),
-            "last_seen": datetime.strptime(
-                userinfo["last_login"], 
-                "%Y-%m-%dT%H:%M:%S.%fZ"
-            )
-        }
+    # fetch current user:
+    current_user = DelegatedUser.query.get(session[Session.ID])
+
+    _, id = userinfo['user_id'].split('|')
+    user = {
+        "id": id,
+        "nickname": userinfo["nickname"],
+        "location": userinfo["user_metadata"]["location"] if ("user_metadata" in userinfo and "location" in userinfo["user_metadata"]) else "",
+        "about_me": userinfo["user_metadata"]["about_me"] if ("user_metadata" in userinfo and "about_me" in userinfo["user_metadata"]) else "",
+        "last_updated": datetime.strptime(
+            userinfo["updated_at"], 
+            "%Y-%m-%dT%H:%M:%S.%fZ"
+        ),
+        "last_seen": datetime.strptime(
+            userinfo["last_login"], 
+            "%Y-%m-%dT%H:%M:%S.%fZ"
+        ),
+        "is_the_same_user": session[Session.ID] == user_id,
+        "is_following": current_user.is_following(selected_user),
+        "num_followers": Follow.query.filter(Follow.followed_id == user_id).count(),
+        "num_followed": Follow.query.filter(Follow.follower_id == user_id).count(),
+    }
 
     return render_template('users/pages/user.html', user=user)
 

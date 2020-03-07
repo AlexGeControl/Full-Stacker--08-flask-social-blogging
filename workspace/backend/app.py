@@ -11,6 +11,7 @@ from application.auth.v1.models import Permission, Role, User
 # for delegated auth:
 from application.auth.v2.models import DelegatedUser
 from application.models import Post, PostFactory
+from application.models import Follow
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 Migrate(app, db)
@@ -157,7 +158,7 @@ def init_db_v2():
         db.session.close()
     # get user summary:
     user_count = DelegatedUser.query.count()   
-    print("[Init Users]: {} in total".format(user_count)) 
+    print("\t[Init Users]: {} in total".format(user_count)) 
 
     # add posts:
     while Post.query.count() < 120:
@@ -176,4 +177,27 @@ def init_db_v2():
     db.session.close()
     # get post summary:
     post_count = Post.query.count()   
-    print("[Init Posts]: {} in total".format(post_count)) 
+    print("\t[Init Posts]: {} in total".format(post_count)) 
+
+    # add follows:
+    num_follows_per_user = user_count // 2 + 1
+    for follower in DelegatedUser.query.all():
+        for _ in range(num_follows_per_user):
+            try:
+                # generate followed:
+                followed = DelegatedUser.query.offset(
+                    randint(0, user_count - 1)
+                ).first()
+                
+                # disable self following:
+                if (follower.id != followed.id) and (not follower.is_following(followed)):
+                    follower.follow(followed)
+                    db.session.commit()
+            except:
+                db.session.rollback()
+    db.session.close()
+    # get post summary:
+    follows_count = Follow.query.count()   
+    print("\t[Init Follows]: {} in total".format(follows_count)) 
+
+    

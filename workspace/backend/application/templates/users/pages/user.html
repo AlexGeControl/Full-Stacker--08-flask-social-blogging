@@ -46,6 +46,25 @@
 			<i class="fas fa-clock"></i>
 			Last Seen {{ moment(user.last_seen).fromNow() }}.
 		</p>
+
+		<!-- follows -->
+		{% if not user["is_the_same_user"] %}
+			{% if user["is_following"] %}
+			<a href="{{ url_for('follows.unfollow', user_id=user.id) }}"
+				class="btn btn-default">Unfollow
+			</a>
+			{% else %}
+			<a href="{{ url_for('follows.follow', user_id=user.id) }}"
+				class="btn btn-default">Follow
+			</a>
+			{% endif %}
+		{% endif %}
+		<a href="{{ url_for('follows.followers', user_id=user.id) }}">
+			Followers: <span class="badge">{{ user["num_followers"] }}</span>
+		</a>
+		<a href="{{ url_for('follows.followed', user_id=user.id) }}">
+			Following: <span class="badge">{{ user["num_followed"] }}</span>
+		</a>
 	</div>
 	
 	<div class="col-sm-6">

@@ -1,0 +1,42 @@
+{% extends 'layouts/main.html' %}
+
+{% from "utils/_render_pagination.html" import render_pagination %}
+
+{% block title %}
+	Uda-Social Blogging | Followers
+{% endblock %}
+
+{% block content %}
+	<h1 class="monospace">
+		Followers of {{ user.nickname }}
+	</h1>
+
+	{% if pagination %}	
+	<div class="pagination">
+		{{ render_pagination(pagination, '.followers', user_id = user.id ) }}
+	</div>
+	{% endif %}
+
+	<ul class="items">
+		{% for follow in follows %}
+		<li>
+			<a href="/users/{{ follow['user'].id }}">
+				<i class="fas fa-sticky-note-o"></i>
+				<div class="item">
+					<blockquote class="blockquote">
+						<p class="mb-0 text-left">
+							{{ follow['user'].nickname }}
+						</p>
+						<footer class="blockquote-footer mt-0 text-right">
+							Following since
+							<cite>
+								{{ moment(follow.timestamp).fromNow() }}
+							</cite>
+						</footer>
+					</blockquote>
+				</div>
+			</a>
+		</li>
+		{% endfor %}
+	</ul>
+{% endblock %}

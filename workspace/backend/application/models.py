@@ -123,3 +123,21 @@ class PostFactory(factory.alchemy.SQLAlchemyModelFactory):
     timestamp = factory.fuzzy.FuzzyDateTime(datetime(2018, 1, 1, tzinfo=timezone.utc))
 
     author_id = factory.Sequence(lambda n: uuid4().hex)
+
+#----------------------------------------------------------------------------#
+# follows
+#----------------------------------------------------------------------------#
+class Follow(db.Model):
+    # follow the best practice
+    __tablename__ = 'follows' 
+
+    # primary key:
+    id = db.Column(db.Integer, primary_key=True) 
+
+    # relationships:
+    follower_id = db.Column(db.String(64), db.ForeignKey('delegated_users.id')) 
+    followed_id = db.Column(db.String(64), db.ForeignKey('delegated_users.id')) 
+
+    # attributes:
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow()) 
+

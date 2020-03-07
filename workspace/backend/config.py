@@ -30,6 +30,8 @@ class Config:
 
     # posts:
     POSTS_PER_PAGE = 15
+    # follows:
+    FOLLOWS_PER_PAGE = 15
     
     # mail service:
     """

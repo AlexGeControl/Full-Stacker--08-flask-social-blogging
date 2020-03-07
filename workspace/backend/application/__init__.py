@@ -128,7 +128,10 @@ def create_app(config_name):
 
     from .posts import bp as blueprint_posts
     app.register_blueprint(blueprint_posts, url_prefix='/posts')
-    
+
+    from .follows import bp as blueprint_follows
+    app.register_blueprint(blueprint_follows, url_prefix='/follows')
+
     #  apis
     #  ----------------------------------------------------------------  
 
