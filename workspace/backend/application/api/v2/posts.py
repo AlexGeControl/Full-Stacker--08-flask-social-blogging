@@ -14,7 +14,7 @@ import uuid
 # create namespace
 ns = Namespace('posts', description='Posts') 
 
-# create response marshallings:
+# create response schemas:
 post_brief = ns.model('PostBrief', 
     {
         'id': fields.String(readonly=True, description='The post unique identifier'),
@@ -94,7 +94,9 @@ class PostList(Resource):
     
     @ns.doc('create_todo')
     @ns.expect(post_input)
+    @ns.response(201, 'Post created')
     @ns.marshal_with(post_detail, code=201)
+    @ns.response(500, 'Internal error. Post could not be deleted')
     def post(self):
         '''Create a new post
         '''
@@ -142,6 +144,7 @@ class PostInstance(Resource):
     '''
     @ns.doc('get_post')
     @ns.marshal_with(post_detail)
+    @ns.response(404, 'Post not found')
     def get(self, id):
         '''Fetch a given post
         '''
@@ -175,6 +178,8 @@ class PostInstance(Resource):
 
     @ns.expect(post_input)
     @ns.marshal_with(post_detail)
+    @ns.response(404, 'Post not found')
+    @ns.response(500, 'Internal error. Post could not be deleted')
     def patch(self, id):
         '''Update a given post
         '''
@@ -222,6 +227,8 @@ class PostInstance(Resource):
 
     @ns.doc('delete_post')
     @ns.response(204, 'Post deleted')
+    @ns.response(404, 'Post not found')
+    @ns.response(500, 'Internal error. Post could not be deleted')
     def delete(self, id):
         '''Delete a given post
         '''
