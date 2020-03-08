@@ -46,12 +46,12 @@ def create_post():
                 # write
                 db.session.commit()
                 # on successful registration, flash success
-                flash('Post was successfully updated.')
+                flash('Post was successfully created.')
                 return redirect(url_for('posts.posts'))
             except:
                 db.session.rollback()
                 # on unsuccessful registration, flash an error instead.
-                flash('An error occurred. Post could not be updated.')
+                flash('An error occurred. Post could not be created.')
             finally:
                 db.session.close()
         else:
@@ -115,7 +115,7 @@ def show_post(post_uuid):
         DelegatedUser.nickname
     ).subquery()
 
-    posts = Post.query.with_entities(
+    post = Post.query.with_entities(
         Post.uuid,
         Post.title,
         user_subq.c.nickname.label("author"),
@@ -126,24 +126,21 @@ def show_post(post_uuid):
         Post.uuid == uuid.UUID(post_uuid)
     ).join(
         user_subq, Post.author_id == user_subq.c.id
-    ).all()
+    ).first()
 
-    if len(posts) == 0:
+    if post is None:
         abort(
             404, 
             description='There is no post with id={}'.format(post_uuid)
         )
 
-    # format:
-    (id, title, author, timestamp, contents, contents_html) = posts[0]
-
     post = {
-        "id": id.hex,
-        "title": title,
-        "author": author,
-        "timestamp": timestamp,
-        "contents": contents,
-        "contents_html": contents_html
+        "id": post.uuid.hex,
+        "title": post.title,
+        "author": post.author,
+        "timestamp": post.timestamp,
+        "contents": post.contents,
+        "contents_html": post.contents_html
     }
 
     return render_template('posts/pages/post.html', post=post)
