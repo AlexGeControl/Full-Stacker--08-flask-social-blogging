@@ -14,6 +14,23 @@ from .decorators import requires_auth
 import json
 from datetime import datetime
 
+@bp.route('/token', methods=['GET'])
+def get_token():
+    """ Get JWT token for Swagger API interaction
+    """
+    return redirect(
+        f'{current_app.config["AUTH0_DOMAIN_URL"]}authorize?audience={current_app.config["AUTH0_AUDIENCE"]}&response_type=token&client_id={current_app.config["AUTH0_CLIENT_ID"]}&redirect_uri=http://localhost:51080/auth/v2/callback-token'
+    )
+
+@bp.route('/callback-token', methods=['GET'])
+def callback_token():
+    """ Get JWT token for Swagger API interaction
+    """    
+    # prompt
+    flash('Your JWT is ready.')
+
+    return render_template('auth/v2/pages/token.html')
+
 #  Callback
 #  ----------------------------------------------------------------
 @bp.route('/callback')
@@ -24,6 +41,7 @@ def callback():
     """
     # authorize connection:
     token = current_app.config['AUTH0'].authorize_access_token()
+    flash(f'Your ID Token {token["id_token"]}')
     # get user profile
     #
     # GET https://DOMAIN/userinfo

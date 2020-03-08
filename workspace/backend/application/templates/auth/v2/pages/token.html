@@ -1,0 +1,52 @@
+{% extends 'layouts/main.html' %}
+
+{% block title %}
+	Authorization | JWT
+{% endblock %}
+
+{% block content %}
+<div class="row">
+	<div class="col-sm-6">
+		<h1 class="monospace">
+			JWT for API Endpoints Access
+		</h1>
+
+		<div class="btn-group btn-group-justified m-4">
+			<a href="{{ url_for('auth_v2.get_token') }}" class="btn btn-outline-warning" role="button">
+				<span class="fa fa-edit"></span>GENERATE AGAIN
+			</a>
+			<a href="/auth/v2/" class="btn btn-outline-danger" role="button">
+				<span class="fa fa-trash"></span>GO TO API
+			</a>
+		</div>
+
+		<div class="seeking">
+			<p class="lead">JWT</p>
+			<div class="description">
+				<i class="fas fa-quote-left"></i> 
+					<span id="jwt"></span>
+				<i class="fas fa-quote-right"></i>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6">
+	</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+	window.addEventListener(
+		'load', 
+		function () {
+			// parse href:
+			const fragment = window.location.hash.substr(1).split('&')[0].split('=');
+			// get token
+			const token = fragment[1];
+			// display:
+			document.getElementById("jwt").textContent = token;
+		}
+	)
+</script>
+{% endblock %}
+

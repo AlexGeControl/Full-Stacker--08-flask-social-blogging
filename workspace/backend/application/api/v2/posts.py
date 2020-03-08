@@ -1,3 +1,6 @@
+from datetime import datetime
+import uuid
+
 from application import db
 
 from application.auth.v2.models import DelegatedUser
@@ -8,11 +11,21 @@ from flask import abort, request
 
 from flask_restplus import Namespace, Resource, fields
 
-from datetime import datetime
-import uuid
+from .auth.decorators import requires_auth
 
 # create namespace
-ns = Namespace('posts', description='Posts') 
+ns = Namespace('posts', description='Posts')
+
+# create permissions:
+class Permission:
+    CREATE_POST = 'post:post'
+    GET_POST_DETAIL = 'get:post-detail'
+    UPDATE_POST = 'patch:post'
+    DELETE_POST = 'delete:post'
+
+# create header schema: 
+parser = ns.parser()
+parser.add_argument('Authorization', location='headers', help="Bearer [YOUR_JWT]")
 
 # create response schemas:
 post_brief = ns.model('PostBrief', 
@@ -42,6 +55,7 @@ post_input = ns.model('PostInput',
 )
 
 @ns.route('/')
+@ns.expect(parser)
 class PostList(Resource):
     ''' post list
         - GET a list of all posts
@@ -96,10 +110,17 @@ class PostList(Resource):
     @ns.expect(post_input)
     @ns.response(201, 'Post created')
     @ns.marshal_with(post_detail, code=201)
+    @ns.response(400, 'Bad Authorization Header. Permissions are missing')
+    @ns.response(401, 'Unauthorized')
+    @ns.response(403, 'Forbidden')
     @ns.response(500, 'Internal error. Post could not be deleted')
-    def post(self):
+    @requires_auth(permission = Permission.CREATE_POST)
+    def post(self, userinfo):
         '''Create a new post
         '''
+        print("[Userinfo]")
+        print(userinfo)
+
         # parse input post:
         post_new = request.get_json()
 
@@ -138,14 +159,19 @@ class PostList(Resource):
         return post_created, 201
 
 @ns.route('/<id>')
+@ns.expect(parser)
 @ns.param('id', 'The post unique identifier')
 class PostInstance(Resource):
     ''' post instance
     '''
     @ns.doc('get_post')
     @ns.marshal_with(post_detail)
+    @ns.response(400, 'Bad Authorization Header. Permissions are missing')
+    @ns.response(401, 'Unauthorized')
+    @ns.response(403, 'Forbidden')
     @ns.response(404, 'Post not found')
-    def get(self, id):
+    @requires_auth(permission = Permission.GET_POST_DETAIL)
+    def get(self, userinfo, id):
         '''Fetch a given post
         '''
         # data:
@@ -176,11 +202,16 @@ class PostInstance(Resource):
 
         return post
 
+    @ns.doc('update_post')
     @ns.expect(post_input)
     @ns.marshal_with(post_detail)
+    @ns.response(400, 'Bad Authorization Header. Permissions are missing')
+    @ns.response(401, 'Unauthorized')
+    @ns.response(403, 'Forbidden')
     @ns.response(404, 'Post not found')
     @ns.response(500, 'Internal error. Post could not be deleted')
-    def patch(self, id):
+    @requires_auth(permission = Permission.UPDATE_POST)
+    def patch(self, userinfo, id):
         '''Update a given post
         '''
         # parse input post:
@@ -227,9 +258,13 @@ class PostInstance(Resource):
 
     @ns.doc('delete_post')
     @ns.response(204, 'Post deleted')
+    @ns.response(400, 'Bad Authorization Header. Permissions are missing')
+    @ns.response(401, 'Unauthorized')
+    @ns.response(403, 'Forbidden')
     @ns.response(404, 'Post not found')
     @ns.response(500, 'Internal error. Post could not be deleted')
-    def delete(self, id):
+    @requires_auth(permission = Permission.DELETE_POST)
+    def delete(self, userinfo, id):
         '''Delete a given post
         '''
         error = True

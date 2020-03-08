@@ -83,6 +83,12 @@
             <li {% if request.endpoint and request.endpoint.startswith('posts') %} class="active" {% endif %}>
               <a href="{{ url_for('posts.posts') }}">Posts</a>
             </li>
+            <li>
+                <a role="button" href="{{ url_for('auth_v2.get_token') }}">
+                    <span class="fa fa-sign-out"></span>
+                    Get JWT
+                </a>
+            </li>
             {% if 'token' in session %}
             <li>
                 <a role="button" href="{{ url_for('users.show_user', user_id = session['id']) }}">

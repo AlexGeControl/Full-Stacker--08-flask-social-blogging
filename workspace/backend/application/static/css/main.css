@@ -208,3 +208,6 @@ h2.monospace {
 .subtitle {
   opacity: 0.5;
 }
+#jwt {
+  overflow-wrap: break-word;
+}

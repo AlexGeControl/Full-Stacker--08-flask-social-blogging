@@ -17,6 +17,7 @@ class Config:
     AUTH0 = None
     AUTH0_ALGORITHMS = ['RS256']
     AUTH0_DOMAIN_URL = 'https://dev-d-and-g-udasocialblogging.auth0.com/'
+    AUTH0_AUDIENCE = 'dev-d-and-g-udasocialblogging-api'
      # TODO: this must be provided as environment variable
     AUTH0_MANAGEMENT_TOKEN = os.environ.get('AUTH0_MANAGEMENT_TOKEN')
     AUTH0_CLIENT_ID = 'i7QHAQjPi6oU1LLFFlU0rlI0q46H3nok'

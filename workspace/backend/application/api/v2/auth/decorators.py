@@ -72,7 +72,7 @@ def verify_decode_token(token):
     """ verify and decode JWT for Auth0
     """
     # load public keys:
-    jsonurl = urlopen(f'{app.config["AUTH0_API_DOMAIN"]}.well-known/jwks.json')
+    jsonurl = urlopen(f'{app.config["AUTH0_DOMAIN_URL"]}.well-known/jwks.json')
     jwks = json.loads(jsonurl.read())
 
     # extract JWT header:
@@ -104,9 +104,9 @@ def verify_decode_token(token):
             payload = jwt.decode(
                 token,
                 rsa_key,
-                algorithms=app.config["AUTH0_API_SIGNATURE_ALGORITHMS"],
-                audience=app.config["AUTH0_API_AUDIENCE"],
-                issuer=app.config["AUTH0_API_DOMAIN"]
+                algorithms=app.config["AUTH0_ALGORITHMS"],
+                audience=app.config["AUTH0_AUDIENCE"],
+                issuer=app.config["AUTH0_DOMAIN_URL"]
             )
 
             return payload
@@ -146,13 +146,6 @@ def verify_decode_token(token):
 
 #  AUTHORIZATION
 #  ----------------------------------------------------------------
-class Permission:
-    GET_DRINKS_DETAIL = 'get:drinks-detail'
-    POST_DRINKS = 'post:drinks'
-    PATCH_DRINKS = 'patch:drinks'
-    DELETE_DRINKS = 'delete:drinks'
-
-
 def check_permission(payload, permission):
     """ RBAC
     """
