@@ -30,28 +30,36 @@ In this project all the RESTful endpoints are implemented using [Flask RESTplus]
 
 ### Structure Endpoints to Respond to Four HTTP methods with Error Handling
 
-The interactive RESTful endpoints using [Swagger UI](https://flask-restplus.readthedocs.io/en/stable/swagger.html#swaggerui) can be accessed at [here][TBD]
+The interactive RESTful endpoints using [Swagger UI](https://flask-restplus.readthedocs.io/en/stable/swagger.html#swaggerui) can be accessed at [here](TBD)
 
 Here is the overview of **posts** endpoints
 
 <img src="doc/restful-api--posts.png" alt="RESTful API Posts"/>
 
-#### Utilize the @app.errorhandler decorator to format error responses as JSON objects for at least four different status codes
+#### Utilize the @app.errorhandler Decorator to Format error Responses as JSON Ojects for at least Four Different Status Codes
 
 All error handlers are implemented inside [here](workspace/backend/application/api/v2/errors.py)
 
 ### Enable Role Based Authentication and Roles-Based Access Control (RBAC) in a Flask application
 
-* Project includes a custom @requires_auth decorator that:
-    * Get the Authorization header from the request
-    * Decode and verify the JWT using the Auth0 secret
-    * Take an argument to describe the action, i.e. @require_auth(‘create:drink’)
-    * Raise an error if:
-        - The token is expired
-        - The claims are invalid
-        - The token is invalid
-        - The JWT doesn’t contain the proper action
-* Project includes at least two different roles that have distinct permissions for actions. These roles and permissions are clearly defined in the project README. Students can reference the Casting Agency Specs in the Specifications section of this rubric as an example.
+#### Project Implements a Custom @requires_auth Decorator
+
+The custom @requires_auth decorator, which implementes
+    * Authentication
+    * Authorization
+can be found [here](workspace/backend/application/api/v2/auth/decorators.py)
+
+#### Project Includes at least Two Different Roles that Have Distinct Permissions for Actions
+
+The two roles defined in this project are as follows:
+
+First role is **admin**, which can perform all actions on posts.
+
+<img src="doc/rbac--roles-admin.png" alt="Roles Administrator"/>
+
+Second role is **user**, which can perform all actions except delete on posts.
+
+<img src="doc/rbac--roles-user.png.png" alt="Roles User"/>
 
 ### Demonstrate Validity of API Behavior
 
@@ -72,9 +80,33 @@ Auth0 is set up and running at the time of submission. All required configuratio
 
 ### Configure Roles-Based Access Control (RBAC)
 
-* Roles and permission tables are configured in Auth0.
-* Access of roles is limited. Includes at least two different roles with different permissions.
-* The JWT includes the RBAC permission claims.
+#### Roles and Permission Tables are Configured in Auth0
+
+The two roles defined in this project are as follows:
+
+First role is **admin**, which can perform all actions on posts.
+
+<img src="doc/rbac--roles-admin.png" alt="Roles Administrator"/>
+
+Second role is **user**, which can perform all actions except delete on posts.
+
+<img src="doc/rbac--roles-user.png" alt="Roles User"/>
+
+#### Access of Roles is Limited. Includes at least Two Different Roles with Different Permissions
+
+Below is the association between roles and accounts in this project
+
+<img src="doc/rbac--role-association-admin.png" alt="Role Association Administrator"/>
+
+<img src="doc/rbac--role-association-user.png" alt="Role Association User"/>
+
+#### The JWT Includes the RBAC Permission Claims
+
+The generated JWT can be analyzed in the [JWT Online Debugger](https://jwt.io/)
+
+Here is one example of decoded JWT payload, which contains the permissions field.
+
+<img src="doc/rbac--jwt-payload.png" alt="Permissions in JWT Payload"/>
 
 ---
 
@@ -90,13 +122,15 @@ Auth0 is set up and running at the time of submission. All required configuratio
 
 First, get the required JWT for Authorization header at [here](TBD)
 
-After that, all the APIs can be tested interactively inside [Swagger UI](https://flask-restplus.readthedocs.io/en/stable/swagger.html#swaggerui). Please interact with the APIs [here][TBD]
+After that, all the APIs can be tested interactively inside [Swagger UI](https://flask-restplus.readthedocs.io/en/stable/swagger.html#swaggerui). Please interact with the APIs [here](TBD)
 
 ---
 
 ## Code Quality & Documentation
 
 ### Write Clear, Concise and Well Documented Code
+
+All the core functionalities follows recommended coding practices plus ample comment for understanding.
 
 ### Project Demonstrates Reliability and Testability
 
@@ -112,4 +146,5 @@ The project has been structured according to [Miguel Grinberg](https://blog.migu
 
 ### Project Includes Thorough Documentation
 
+The project has been well documented both for local and on Heroku evaluation.
 
