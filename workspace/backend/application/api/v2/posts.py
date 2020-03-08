@@ -22,6 +22,7 @@ class Permission:
     GET_POST_DETAIL = 'get:post-detail'
     UPDATE_POST = 'patch:post'
     DELETE_POST = 'delete:post'
+    ADMIN_ALL = 'admin:all'
 
 # create header schema: 
 parser = ns.parser()
@@ -62,7 +63,7 @@ class PostList(Resource):
         - POST to add new tasks
     '''
     @ns.doc(
-        'list_todos', 
+        'list_posts', 
         params={'page': 'Page number for pagination'}
     )
     @ns.marshal_list_with(post_brief)
@@ -106,7 +107,7 @@ class PostList(Resource):
 
         return posts
     
-    @ns.doc('create_todo')
+    @ns.doc('create_post')
     @ns.expect(post_input)
     @ns.response(201, 'Post created')
     @ns.marshal_with(post_detail, code=201)
@@ -114,27 +115,34 @@ class PostList(Resource):
     @ns.response(401, 'Unauthorized')
     @ns.response(403, 'Forbidden')
     @ns.response(500, 'Internal error. Post could not be deleted')
-    @requires_auth(permission = Permission.CREATE_POST)
-    def post(self, userinfo):
+    @requires_auth(permissions = [Permission.CREATE_POST])
+    def post(userinfo, self):
         '''Create a new post
         '''
-        print("[Userinfo]")
-        print(userinfo)
-
         # parse input post:
         post_new = request.get_json()
 
         error = True
         try:
-            # create new post:
-            id = Post.query.count() + 1
+            # create new post id:
+            if Post.query.count() == 0:
+                id = 1
+            else:
+                from sqlalchemy.sql import func
+                post_id_summary = db.session.query(
+                    func.max(Post.id).label("max")
+                ).one()
+                id = post_id_summary.max + 1
 
+            # extract author id:
+            _, author_id = userinfo['sub'].split('|')
+
+            # create new post:
             post = Post(
                 id = id,
                 title = post_new['title'],
                 contents = post_new['contents'],
-                # TODO: parse author_id from JWT payload, currently fixed to admin01
-                author_id = '5e6305a010b4610d3d895cd4'
+                author_id = author_id
             )
             # insert:
             db.session.add(post)
@@ -170,8 +178,8 @@ class PostInstance(Resource):
     @ns.response(401, 'Unauthorized')
     @ns.response(403, 'Forbidden')
     @ns.response(404, 'Post not found')
-    @requires_auth(permission = Permission.GET_POST_DETAIL)
-    def get(self, userinfo, id):
+    @requires_auth(permissions = [Permission.GET_POST_DETAIL])
+    def get(userinfo, self, id):
         '''Fetch a given post
         '''
         # data:
@@ -210,8 +218,8 @@ class PostInstance(Resource):
     @ns.response(403, 'Forbidden')
     @ns.response(404, 'Post not found')
     @ns.response(500, 'Internal error. Post could not be deleted')
-    @requires_auth(permission = Permission.UPDATE_POST)
-    def patch(self, userinfo, id):
+    @requires_auth(permissions = [Permission.UPDATE_POST])
+    def patch(userinfo, self, id):
         '''Update a given post
         '''
         # parse input post:
@@ -230,6 +238,17 @@ class PostInstance(Resource):
                     404, 
                     description='There is no post with id={}'.format(id)
                 )
+            
+            # extract current user id:
+            _, author_id = userinfo['sub'].split('|')
+
+            # when current user isn't the post auther and doesn't have admin permission, decline the update
+            if (post.author_id != author_id) and (not Permission.ADMIN_ALL in userinfo['permissions']):
+                abort(
+                    403, 
+                    description="You don't have the permission to modify"
+                )
+
             # update:
             post.title = post_updated["title"]
             post.contents = post_updated["contents"]
@@ -263,7 +282,7 @@ class PostInstance(Resource):
     @ns.response(403, 'Forbidden')
     @ns.response(404, 'Post not found')
     @ns.response(500, 'Internal error. Post could not be deleted')
-    @requires_auth(permission = Permission.DELETE_POST)
+    @requires_auth(permissions = [Permission.DELETE_POST])
     def delete(self, userinfo, id):
         '''Delete a given post
         '''

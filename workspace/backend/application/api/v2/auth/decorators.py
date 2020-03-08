@@ -146,7 +146,7 @@ def verify_decode_token(token):
 
 #  AUTHORIZATION
 #  ----------------------------------------------------------------
-def check_permission(payload, permission):
+def check_permission(payload, permissions):
     """ RBAC
     """
     if 'permissions' not in payload:
@@ -158,18 +158,19 @@ def check_permission(payload, permission):
             400
         )
 
-    if permission not in payload['permissions']:
-        raise AuthError(
-            {
-                'code': 'unauthorized',
-                'description': 'Permission not found.'
-            }, 
-            403
-        )
+    for permission in permissions:
+        if permission not in payload['permissions']:
+            raise AuthError(
+                {
+                    'code': 'unauthorized',
+                    'description': 'Permission not found.'
+                }, 
+                403
+            )
 
 #  AUTHENTICATION
 #  ----------------------------------------------------------------
-def requires_auth(permission = None):
+def requires_auth(permissions = None):
     """ decorator for authentication
     """
     def decorator(f):
@@ -181,8 +182,8 @@ def requires_auth(permission = None):
                 # authentication:
                 payload = verify_decode_token(token)
                 # authorization:
-                if not (permission is None):
-                    check_permission(payload, permission)
+                if not (permissions is None):
+                    check_permission(payload, permissions)
             except AuthError as e:
                 abort(e.status_code, description=e.error["description"])
                 
