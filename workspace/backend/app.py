@@ -200,4 +200,7 @@ def init_db_v2():
     follows_count = Follow.query.count()   
     print("\t[Init Follows]: {} in total".format(follows_count)) 
 
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=80, debug=True)
+
     

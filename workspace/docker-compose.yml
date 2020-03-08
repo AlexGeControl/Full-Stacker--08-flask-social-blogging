@@ -9,7 +9,9 @@ services:
     env_file:
       - ${PWD}/backend/uda-social-blogging.env
     ports:
+      # http:
       - "51080:80"
+      # https:
       - "51443:443"
     volumes:
       # remove the following for production with Dockerfile ADD
@@ -20,7 +22,8 @@ services:
       - ${PWD}/backend/config.py:/app/config.py
       - ${PWD}/backend/app.py:/app/app.py
       - ${PWD}/backend/requirements.txt:/app/requirements.txt
-      - ${PWD}/backend/uwsgi.ini:/app/uwsgi.ini      
+      - ${PWD}/backend/uwsgi.ini:/app/uwsgi.ini  
+      - ${PWD}/backend/start.sh:/app/start.sh      
     depends_on:
       - db
       - adminer

@@ -134,6 +134,8 @@ def create_app(config_name):
 
     #  apis
     #  ----------------------------------------------------------------  
+    from .api.v2 import bp as blueprint_api 
+    app.register_blueprint(blueprint_api, url_prefix='/api/v2')
 
     return app
 
