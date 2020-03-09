@@ -65,7 +65,7 @@ class DevelopmentConfig(Config):
 
     # pgsql:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
-       'postgresql://udacity:udacity@db:5432/udasocialbloggingapp'
+       'postgres://jymqfwebhbhmqo:2e3b7278bd5ac51d89edbad6630ee2ece644d47a9e5f2b979c46723e982a2c44@ec2-50-17-178-87.compute-1.amazonaws.com:5432/d2fk3rfellliga'
 
 class TestingConfig(Config):
     TESTING = True
@@ -88,7 +88,7 @@ class ProductionConfig(Config):
     #     'sqlite:///' + os.path.join(basedir, 'todos.sqlite')
     
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'postgresql://udacity:udacity@db:5432/udasocialbloggingapp'
+        'postgres://jymqfwebhbhmqo:2e3b7278bd5ac51d89edbad6630ee2ece644d47a9e5f2b979c46723e982a2c44@ec2-50-17-178-87.compute-1.amazonaws.com:5432/d2fk3rfellliga'
 
 class HerokuConfig(Config):
     # ssl:

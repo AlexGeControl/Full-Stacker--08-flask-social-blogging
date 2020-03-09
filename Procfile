@@ -1,1 +1,1 @@
-web: cd workspace/backend && gunicorn app:app
+web: cd workspace/backend && flask init-db-v2 && gunicorn app:app
