@@ -118,15 +118,23 @@ Here is one example of decoded JWT payload, which contains the permissions field
 
 ### Application is Hosted Live at Student Provided URL
 
-* API is hosted live via Heroku
-* URL is provided in project README
-* API can be accessed by URL and requires authentication
+The APP is hosted on Heroku at [D & G Services Uda Social Blogging](https://d-and-g-uda-social-blogging.herokuapp.com/)
+
+The API is available as Swagger UI at [D & G Services Uda Social Blogging APIs](https://d-and-g-uda-social-blogging.herokuapp.com/api/v2/)
+
+Please follow the instructions below to play around with the APIs.
 
 ### Includes Instructions to Set Up Authentication
 
-First, get the required JWT for Authorization header at [here](TBD)
+First, get the required JWT for Authorization header at [here](https://d-and-g-uda-social-blogging.herokuapp.com/)
 
-After that, all the APIs can be tested interactively inside [Swagger UI](https://flask-restplus.readthedocs.io/en/stable/swagger.html#swaggerui). Please interact with the APIs [here](TBD)
+Copy this token for API debugging
+
+<img src="doc/rbac--jwt-payload.png" alt="Permissions in JWT Payload"/>
+
+After that, all the APIs can be tested interactively inside [Swagger UI](https://flask-restplus.readthedocs.io/en/stable/swagger.html#swaggerui). Please interact with the APIs [here](https://d-and-g-uda-social-blogging.herokuapp.com/api/v2/). Below is one example for **create new post**.
+
+<img src="doc/rbac--jwt-payload.png" alt="Permissions in JWT Payload"/>
 
 ---
 
