@@ -126,15 +126,25 @@ Please follow the instructions below to play around with the APIs.
 
 ### Includes Instructions to Set Up Authentication
 
-First, get the required JWT for Authorization header at [here](https://d-and-g-uda-social-blogging.herokuapp.com/)
+First, get the required JWT for Authorization header at [here](https://d-and-g-uda-social-blogging.herokuapp.com/auth/v2/token)
+
+You can login using the following accounts:
+
+| No |            Account            |          Password         |
+|:--:|:-----------------------------:|:-------------------------:|
+|  1 | guest01@udasocialblogging.com | guest01@udasocialblogging |
+|  2 |  user01@udasocialblogging.com |  user01@udasocialblogging |
+|  3 | admin01@udasocialblogging.com | admin01@udasocialblogging |
 
 Copy this token for API debugging
 
-<img src="doc/rbac--jwt-payload.png" alt="Permissions in JWT Payload"/>
+<img src="doc/restful-api--jwt-gen.png" alt="Permissions in JWT Payload"/>
 
 After that, all the APIs can be tested interactively inside [Swagger UI](https://flask-restplus.readthedocs.io/en/stable/swagger.html#swaggerui). Please interact with the APIs [here](https://d-and-g-uda-social-blogging.herokuapp.com/api/v2/). Below is one example for **create new post**.
 
-<img src="doc/rbac--jwt-payload.png" alt="Permissions in JWT Payload"/>
+<img src="doc/restful-api--create-post-user.png" alt="Create Post -- Guest"/>
+
+Fill in the **Authorization Header** with "Bearer [THE_JWT_TOKEN_ABOVE]". Enjoy!
 
 ---
 
@@ -148,9 +158,10 @@ All the core functionalities follows recommended coding practices plus ample com
 
 The backend is deployed for production using the following best practices:
 
-* One
-* Two
-* Three
+* **Log Collection** Outputs from stdout and stderr of Heroku are collected by flask logger.
+* **SSL Proxy** SSL redirect is enabled
+
+Please find the Heroku deployment details inside [HerokuConfig]((workspace/backend/config.py))
 
 ### Project Demonstrates Maintainability
 

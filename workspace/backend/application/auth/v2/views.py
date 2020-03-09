@@ -25,7 +25,10 @@ def get_token():
 @bp.route('/callback-token', methods=['GET'])
 def callback_token():
     """ Get JWT token for Swagger API interaction
-    """    
+    """
+    # clear session:
+    session.clear()
+        
     # prompt
     flash('Your JWT is ready.')
 
@@ -74,7 +77,7 @@ def login():
     """ Auth0 login
     """
     return current_app.config['AUTH0'].authorize_redirect(
-        redirect_uri='https://d-and-g-uda-social-blogging.herokuapp.com/auth/v2/callback'
+        redirect_uri="https://d-and-g-uda-social-blogging.herokuapp.com/auth/v2/callback"
     )
 
 #  Register
@@ -138,7 +141,7 @@ def logout():
     flash('You have been logged out.')
     # build query params:
     query_params = {
-        'returnTo': 'https://d-and-g-uda-social-blogging.herokuapp.com/', 
+        'returnTo': "https://d-and-g-uda-social-blogging.herokuapp.com/", 
         'client_id': current_app.config['AUTH0_CLIENT_ID']
     }
 
