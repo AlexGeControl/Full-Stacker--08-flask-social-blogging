@@ -80,11 +80,7 @@ The coverage rate is limited due to the implementation nature of Flask RESTPlus.
 
 ### Configure Third-Party Authentication Systems
 
-Auth0 is set up and running at the time of submission. All required configuration settings are included in a bash file which export:
-
-- The Auth0 Domain Name
-- The JWT code signing secret
-- The Auth0 Client ID
+The Auth0 Domain Name, Client ID and the two JWT code signing secrets are available at [here](workspace/backend/config.py)
 
 ### Configure Roles-Based Access Control (RBAC)
 

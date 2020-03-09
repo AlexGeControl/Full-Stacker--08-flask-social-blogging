@@ -1,1 +1,5 @@
+# pyc
 *.pyc
+# auth0 credentials:
+export-uda-social-blogging-env.sh
+uda-social-blogging.env

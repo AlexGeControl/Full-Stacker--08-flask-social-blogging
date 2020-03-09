@@ -5,10 +5,10 @@ from flask import request, session, render_template, redirect, url_for, flash
 from six.moves.urllib.parse import urlencode
 
 from . import bp
+from . import service_user_management
 from .session import Session
 from .forms import LoginForm, RegistrationForm
 from .models import DelegatedUser
-from .services import Users
 from .decorators import requires_auth
 
 import json
@@ -79,8 +79,6 @@ def login():
 
 #  Register
 #  ----------------------------------------------------------------
-users = Users()
-
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     """ register new account
@@ -91,7 +89,7 @@ def register():
         # validate form:
         if form.validate():
             # create user in backend:
-            response = users.post(
+            response = service_user_management.post(
                 email = form.email.data,
                 password = form.password.data
             )

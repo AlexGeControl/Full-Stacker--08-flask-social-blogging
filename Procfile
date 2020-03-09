@@ -1,0 +1,1 @@
+web: cd workspace/backend && gunicorn app:app

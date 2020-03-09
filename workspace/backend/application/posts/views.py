@@ -32,9 +32,17 @@ def create_post():
 
         if form.validate():        
             try:
+                # create new post id:
+                if Post.query.count() == 0:
+                    id = 1
+                else:
+                    from sqlalchemy.sql import func
+                    post_id_summary = db.session.query(
+                        func.max(Post.id).label("max")
+                    ).one()
+                    id = post_id_summary.max + 1
+                
                 # create new post:
-                id = Post.query.count() + 1
-
                 post = Post(
                     id = id,
                     title = form.title.data,
@@ -43,8 +51,9 @@ def create_post():
                 )
                 # insert:
                 db.session.add(post)
-                # write
+                # commit:
                 db.session.commit()
+                
                 # on successful registration, flash success
                 flash('Post was successfully created.')
                 return redirect(url_for('posts.posts'))

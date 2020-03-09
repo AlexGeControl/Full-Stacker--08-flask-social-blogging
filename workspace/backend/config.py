@@ -10,6 +10,9 @@ class Config:
     # security:
     SECRET_KEY = os.environ.get('SECRET_KEY') or os.urandom(32)
 
+    # ssl: 
+    SSL_REDIRECT = False
+
     # database:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -87,11 +90,35 @@ class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'postgresql://udacity:udacity@db:5432/udasocialbloggingapp'
 
+class HerokuConfig(Config):
+    # ssl:
+    SSL_REDIRECT = True if os.environ.get('DYNO') else False
+    
+    # use heroku pg instance:    
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+
+    @staticmethod
+    def init_app(app):
+        """ specific init for heroku 
+        """
+        # enable heroku logs
+        import logging
+        from logging import StreamHandler
+
+        file_handler = StreamHandler()
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
+
+        # handle reverse proxy server headers        
+        from werkzeug.contrib.fixers import ProxyFix        
+        app.wsgi_app = ProxyFix(app.wsgi_app)
+
 # configs:
 config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
     'production': ProductionConfig,
+    'heroku': HerokuConfig,
 
     'default': DevelopmentConfig
 }
